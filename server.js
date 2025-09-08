@@ -14,7 +14,7 @@ dotenv.config();
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
-const _dirname = path.dirname(_filename);
+const __dirname = path.dirname(__filename);
 
 // middleware
 app.use(cors());
@@ -37,5 +37,5 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customers.html')));
 app.get('/customer', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customer.html')));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
