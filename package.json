@@ -1,0 +1,24 @@
+{
+  "name": "property-system-management-",
+  "version": "1.0.0",
+  "description": "Property Management System A comprehensive, web-based Property Management System designed to streamline rental management for property managers and provide a transparent, communicative experience for tenants. Built with the MVC architecture using Node.js, Express, MongoDB, and Materialize CSS.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prem225101332/property-system-management-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prem225101332/property-system-management-/issues"
+  },
+  "homepage": "https://github.com/prem225101332/property-system-management-#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
