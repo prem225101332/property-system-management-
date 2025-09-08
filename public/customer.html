@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>My Rent – Customer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>My Rent</h1>
+    <div><button id="logoutBtn">Logout</button></div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Details</h2>
+      <p><strong>Name:</strong> <span id="cName"></span></p>
+      <p><strong>Email:</strong> <span id="cEmail"></span></p>
+      <p><strong>Company:</strong> <span id="cCompany"></span></p>
+      <p><strong>Due Amount:</strong> $<span id="cDue">0</span></p>
+      <p><strong>Status:</strong> <span id="cPaid">Unknown</span></p>
+
+      <div id="payBox" class="row hidden">
+        <label><input type="checkbox" id="paidCheck" /> I paid the due amount</label>
+        <button id="markPaidBtn">Update as Paid</button>
+        <p id="payMsg" class="msg"></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/common.js"></script>
+  <script src="./js/customer_view.js"></script>
+</body>
+</html>
