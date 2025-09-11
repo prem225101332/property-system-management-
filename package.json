@@ -29,5 +29,8 @@
     "mongodb": "^6.19.0",
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
