@@ -1,13 +1,13 @@
 {
-  "name": "property-management-frontend",
+  "name": "property-management-system",
   "version": "1.0.0",
-  "description": "Frontend-only Property Management System",
+  "description": "Frontend Property Management System",
   "main": "index.html",
   "type": "module",
   "scripts": {
-    "dev": "npx vite",
-    "build": "npx vite build",
-    "preview": "npx vite preview"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "vite": "^5.0.0"

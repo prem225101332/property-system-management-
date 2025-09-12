@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Management Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="material-icons">business</span>
+                Property Manager
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="material-icons">account_circle</span>
+                    <span id="userName">Loading...</span>
+                    <span id="userRole" class="badge badge-success">Admin</span>
+                </div>
+                <button class="button button-secondary" id="logoutBtn">
+                    <span class="material-icons">logout</span>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="dashboard">
+                    <span class="material-icons">dashboard</span>
+                    Dashboard
+                </button>
+                <button class="nav-tab" data-tab="properties" id="propertiesTab">
+                    <span class="material-icons">home</span>
+                    Properties
+                </button>
+                <button class="nav-tab" data-tab="tenants" id="tenantsTab">
+                    <span class="material-icons">people</span>
+                    Tenants
+                </button>
+                <button class="nav-tab" data-tab="bills" id="billsTab">
+                    <span class="material-icons">receipt</span>
+                    Bills
+                </button>
+                <button class="nav-tab" data-tab="chat">
+                    <span class="material-icons">chat</span>
+                    Chat
+                </button>
+                <button class="nav-tab" data-tab="profile">
+                    <span class="material-icons">person</span>
+                    Profile
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard-tab">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalProperties">0</div>
+                    <div class="stat-label">Total Properties</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="occupiedProperties">0</div>
+                    <div class="stat-label">Occupied Properties</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTenants">0</div>
+                    <div class="stat-label">Total Tenants</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pendingBills">0</div>
+                    <div class="stat-label">Pending Bills</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRevenue">$0</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Activity</h2>
+                    <p class="card-description">Latest updates and notifications</p>
+                </div>
+                <div class="card-content">
+                    <div id="recentActivity">
+                        <p class="text-center">No recent activity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Properties Tab -->
+        <div class="tab-content" id="properties-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Add New Property</h2>
+                    <p class="card-description">Enter property details</p>
+                </div>
+                <div class="card-content">
+                    <form class="form" id="propertyForm">
+                        <input type="hidden" id="propertyId">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="propertyName">Property Name</label>
+                                <input class="input" id="propertyName" type="text" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="propertyType">Property Type</label>
+                                <select class="select" id="propertyType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Apartment">Apartment</option>
+                                    <option value="House">House</option>
+                                    <option value="Condo">Condo</option>
+                                    <option value="Loft">Loft</option>
+                                    <option value="Studio">Studio</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="propertyAddress">Address</label>
+                            <textarea class="textarea" id="propertyAddress" required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="rentAmount">Monthly Rent ($)</label>
+                                <input class="input" id="rentAmount" type="number" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="deposit">Security Deposit ($)</label>
+                                <input class="input" id="deposit" type="number" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="propertyStatus">Status</label>
+                                <select class="select" id="propertyStatus" required>
+                                    <option value="Available">Available</option>
+                                    <option value="Occupied">Occupied</option>
+                                    <option value="Maintenance">Under Maintenance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="button button-primary">
+                                <span class="material-icons">save</span>
+                                Save Property
+                            </button>
+                            <button type="button" class="button button-secondary" id="cancelPropertyEdit">
+                                <span class="material-icons">cancel</span>
+                                Cancel
+                            </button>
+                        </div>
+                        <div id="propertyMessage" class="hidden"></div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Properties List</h2>
+                    <p class="card-description">Manage your property portfolio</p>
+                </div>
+                <div class="card-content">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Address</th>
+                                    <th>Rent</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="propertiesTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading properties...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tenants Tab -->
+        <div class="tab-content" id="tenants-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Add New Tenant</h2>
+                    <p class="card-description">Register a new tenant</p>
+                </div>
+                <div class="card-content">
+                    <form class="form" id="tenantForm">
+                        <input type="hidden" id="tenantId">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="tenantName">Full Name</label>
+                                <input class="input" id="tenantName" type="text" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="tenantEmail">Email</label>
+                                <input class="input" id="tenantEmail" type="email" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="tenantPhone">Phone</label>
+                                <input class="input" id="tenantPhone" type="tel" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="assignedProperty">Assigned Property</label>
+                                <select class="select" id="assignedProperty">
+                                    <option value="">Select Property</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="leaseStart">Lease Start Date</label>
+                                <input class="input" id="leaseStart" type="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="leaseEnd">Lease End Date</label>
+                                <input class="input" id="leaseEnd" type="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="tenantStatus">Status</label>
+                                <select class="select" id="tenantStatus" required>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="button button-primary">
+                                <span class="material-icons">save</span>
+                                Save Tenant
+                            </button>
+                            <button type="button" class="button button-secondary" id="cancelTenantEdit">
+                                <span class="material-icons">cancel</span>
+                                Cancel
+                            </button>
+                        </div>
+                        <div id="tenantMessage" class="hidden"></div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Tenants List</h2>
+                    <p class="card-description">Manage tenant information</p>
+                </div>
+                <div class="card-content">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Property</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tenantsTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading tenants...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bills Tab -->
+        <div class="tab-content" id="bills-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Generate Bill</h2>
+                    <p class="card-description">Create a new bill for tenant</p>
+                </div>
+                <div class="card-content">
+                    <form class="form" id="billForm">
+                        <input type="hidden" id="billId">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="billTenant">Tenant</label>
+                                <select class="select" id="billTenant" required>
+                                    <option value="">Select Tenant</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="billType">Bill Type</label>
+                                <select class="select" id="billType" required>
+                                    <option value="Rent">Monthly Rent</option>
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="billAmount">Amount ($)</label>
+                                <input class="input" id="billAmount" type="number" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="billDueDate">Due Date</label>
+                                <input class="input" id="billDueDate" type="date" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="billDescription">Description</label>
+                            <textarea class="textarea" id="billDescription" placeholder="Enter bill description"></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="button button-primary">
+                                <span class="material-icons">save</span>
+                                Generate Bill
+                            </button>
+                            <button type="button" class="button button-secondary" id="cancelBillEdit">
+                                <span class="material-icons">cancel</span>
+                                Cancel
+                            </button>
+                        </div>
+                        <div id="billMessage" class="hidden"></div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Bills Management</h2>
+                    <p class="card-description">Track and manage all bills</p>
+                </div>
+                <div class="card-content">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Tenant</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billsTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading bills...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div class="tab-content" id="chat-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Communication Center</h2>
+                    <p class="card-description">Chat with tenants in real-time</p>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label class="label" for="chatTenant">Select Tenant to Chat</label>
+                        <select class="select" id="chatTenant">
+                            <option value="">Choose a tenant...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="chat-container" id="chatContainer" style="display: none;">
+                        <div class="chat-messages" id="chatMessages"></div>
+                        <div class="chat-input">
+                            <input class="input" id="messageInput" type="text" placeholder="Type your message...">
+                            <button class="button button-primary" id="sendMessage">
+                                <span class="material-icons">send</span>
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div class="tab-content" id="profile-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Profile Settings</h2>
+                    <p class="card-description">Manage your account information</p>
+                </div>
+                <div class="card-content">
+                    <form class="form" id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="profileName">Full Name</label>
+                                <input class="input" id="profileName" type="text" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="profileEmail">Email</label>
+                                <input class="input" id="profileEmail" type="email" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="label" for="currentPassword">Current Password</label>
+                                <input class="input" id="currentPassword" type="password">
+                            </div>
+                            <div class="form-group">
+                                <label class="label" for="newPassword">New Password</label>
+                                <input class="input" id="newPassword" type="password">
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="button button-primary">
+                                <span class="material-icons">save</span>
+                                Update Profile
+                            </button>
+                        </div>
+                        <div id="profileMessage" class="hidden"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
