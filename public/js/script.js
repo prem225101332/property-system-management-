@@ -1,10 +1,8 @@
-// Tab switching functionality
 const tabTriggers = document.querySelectorAll(".tab-trigger")
 const tabContents = document.querySelectorAll(".tab-content")
 const switchButtons = document.querySelectorAll("[data-switch]")
 
 function switchTab(targetTab) {
-  // Update tab triggers
   tabTriggers.forEach((trigger) => {
     trigger.classList.remove("active")
     if (trigger.dataset.tab === targetTab) {
@@ -12,7 +10,6 @@ function switchTab(targetTab) {
     }
   })
 
-  // Update tab contents
   tabContents.forEach((content) => {
     content.classList.remove("active")
     if (content.id === `${targetTab}-tab`) {
@@ -21,21 +18,18 @@ function switchTab(targetTab) {
   })
 }
 
-// Tab trigger event listeners
 tabTriggers.forEach((trigger) => {
   trigger.addEventListener("click", () => {
     switchTab(trigger.dataset.tab)
   })
 })
 
-// Switch button event listeners
 switchButtons.forEach((button) => {
   button.addEventListener("click", () => {
     switchTab(button.dataset.switch)
   })
 })
 
-// Password visibility toggle
 document.querySelectorAll(".password-toggle").forEach((toggle) => {
   toggle.addEventListener("click", () => {
     const targetId = toggle.dataset.target
@@ -51,7 +45,6 @@ document.querySelectorAll(".password-toggle").forEach((toggle) => {
   })
 })
 
-// Role selection handler for admin ID
 document.getElementById("signup-role").addEventListener("change", (e) => {
   const adminIdGroup = document.getElementById("admin-id-group")
   const adminIdInput = document.getElementById("admin-id")
@@ -66,7 +59,6 @@ document.getElementById("signup-role").addEventListener("change", (e) => {
   }
 })
 
-// Message display functions
 function showMessage(elementId, message, isError = true) {
   const messageEl = document.getElementById(elementId)
   messageEl.textContent = message
@@ -79,7 +71,6 @@ function hideMessage(elementId) {
   messageEl.classList.add("hidden")
 }
 
-// Loading state functions
 function setLoading(buttonId, isLoading, loadingText, normalText) {
   const button = document.getElementById(buttonId)
   button.disabled = isLoading
@@ -93,7 +84,6 @@ function setLoading(buttonId, isLoading, loadingText, normalText) {
   }
 }
 
-// API helper function
 async function apiCall(url, method, data) {
   const response = await fetch(url, {
     method,
@@ -112,7 +102,6 @@ async function apiCall(url, method, data) {
   return result
 }
 
-// Login form handler
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault()
   hideMessage("login-message")
@@ -125,11 +114,9 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   try {
     const result = await apiCall("/api/auth/login", "POST", { email, password })
 
-    // Save token
     localStorage.setItem("token", result.token)
 
-    // Redirect based on role
-    const redirectUrl = result.user?.role === "Admin" ? "/customers.html" : "/customer.html"
+    const redirectUrl = result.user?.role === "Admin" ? "/admin.html" : "/tenant.html"
     window.location.href = redirectUrl
   } catch (error) {
     showMessage("login-message", error.message, true)
@@ -138,7 +125,6 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 })
 
-// Signup form handler
 document.getElementById("signupForm").addEventListener("submit", async (e) => {
   e.preventDefault()
   hideMessage("signup-message")
@@ -151,7 +137,6 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
   const role = formData.get("role")
   const adminId = formData.get("adminId")
 
-  // Validate admin ID if role is Admin
   if (role === "Admin") {
     if (!adminId || adminId.trim() !== "2694") {
       showMessage("signup-message", "Invalid admin ID. Please contact administrator for correct ID.", true)
@@ -165,7 +150,6 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
 
     showMessage("signup-message", "Registration successful! Please login with your credentials.", false)
 
-    // Switch to login tab after success
     setTimeout(() => {
       switchTab("login")
     }, 1500)
@@ -176,11 +160,9 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
   }
 })
 
-// Enhanced form validation with real-time feedback
 document.addEventListener("input", (e) => {
   const input = e.target
 
-  // Email validation
   if (input.type === "email") {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (input.value && !emailRegex.test(input.value)) {
@@ -190,7 +172,6 @@ document.addEventListener("input", (e) => {
     }
   }
 
-  // Password strength indicator
   if (input.type === "password") {
     if (input.value.length > 0 && input.value.length < 6) {
       input.style.borderColor = "#dc2626"

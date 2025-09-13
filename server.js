@@ -34,8 +34,8 @@ app.use('/api/customers', customerRoutes);
 
 // default pages
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customers.html')));
-app.get('/customer', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customer.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/customer', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tenant.html')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
