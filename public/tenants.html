@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Property Management System - Properties</title>
+    <title>Property Management System - Tenants</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/css/admin.css" rel="stylesheet">
 </head>
@@ -24,11 +24,11 @@
                     <i class="fas fa-chart-pie"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="/properties" class="nav-item active">
+                <a href="/properties" class="nav-item">
                     <i class="fas fa-home"></i>
                     <span>Properties</span>
                 </a>
-                <a href="/tenants" class="nav-item">
+                <a href="/tenants" class="nav-item active">
                     <i class="fas fa-users"></i>
                     <span>Tenants</span>
                 </a>
@@ -49,8 +49,8 @@
     <div class="main-content">
         <header class="header">
             <div class="header-left">
-                <h1>Property Management</h1>
-                <p>Manage your properties</p>
+                <h1>Tenant Management</h1>
+                <p>Manage your tenants</p>
             </div>
             <div class="header-right">
                 <a href="/profile" class="user-profile">
@@ -59,79 +59,86 @@
             </div>
         </header>
 
-        <div class="properties-table-section">
+        <div class="tenants-table-section">
             <div class="section-header">
                 <div>
-                    <h3>All Properties</h3>
-                    <p>Manage your property portfolio</p>
+                    <h3>All Tenants</h3>
+                    <p>Manage your tenants</p>
                 </div>
-                <button class="add-btn" id="addNewPropertyBtn">
+                <button class="add-btn" id="addNewTenantBtn">
                     <i class="fas fa-plus"></i>
-                    Add Property
+                    Add Tenant
                 </button>
             </div>
             <div class="table-container">
-                <table class="properties-table">
+                <table class="tenants-table">
                     <thead>
                         <tr>
-                            <th>Image</th>
-                            <th>Title</th>
-                            <th>Address</th>
-                            <th>Price</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Property</th>
+                            <th>Rent</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="propertiesTableBody">
-                        <!-- Properties will be loaded dynamically -->
+                    <tbody id="tenantsTableBody">
+                        <!-- Tenants will be loaded dynamically -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Add Property Modal -->
-    <div class="modal" id="propertyModal">
+    <!-- Add Tenant Modal -->
+    <div class="modal" id="tenantModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="propertyModalTitle">Add New Property</h3>
+                <h3 id="tenantModalTitle">Add New Tenant</h3>
                 <button class="close-btn">&times;</button>
             </div>
-            <form id="propertyForm">
-                <input type="hidden" id="propertyId">
+            <form id="tenantForm">
+                <input type="hidden" id="tenantId">
                 <div class="form-group">
-                    <label for="propertyTitle">Property Title</label>
-                    <input type="text" id="propertyTitle" class="form-control" required>
+                    <label for="tenantName">Full Name</label>
+                    <input type="text" id="tenantName" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="propertyAddress">Address</label>
-                    <input type="text" id="propertyAddress" class="form-control" required>
+                    <label for="tenantEmail">Email</label>
+                    <input type="email" id="tenantEmail" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="propertyPrice">Monthly Rent ($)</label>
-                    <input type="number" id="propertyPrice" class="form-control" required>
+                    <label for="tenantPhone">Phone Number</label>
+                    <input type="tel" id="tenantPhone" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="propertyStatus">Status</label>
-                    <select id="propertyStatus" class="form-control" required>
-                        <option value="occupied">Occupied</option>
-                        <option value="vacant">Vacant</option>
-                        <option value="pending">Pending</option>
+                    <label for="tenantProperty">Assigned Property</label>
+                    <select id="tenantProperty" class="form-control" required>
+                        <option value="">Select a property</option>
+                        <!-- Options will be populated dynamically -->
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="propertyImage">Property Image URL</label>
-                    <input type="text" id="propertyImage" class="form-control" placeholder="https://...">
+                    <label for="tenantRent">Monthly Rent ($)</label>
+                    <input type="number" id="tenantRent" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="tenantStatus">Payment Status</label>
+                    <select id="tenantStatus" class="form-control" required>
+                        <option value="paid">Paid</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary close-btn">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Property</button>
+                    <button type="submit" class="btn btn-primary">Save Tenant</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script type="module" src="/js/common.js"></script>
-    <script src="/js/properties.js"></script>
+    <script src="/js/tenants.js"></script>
 </body>
 </html>
