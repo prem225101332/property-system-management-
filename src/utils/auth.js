@@ -3,7 +3,7 @@ function isApiRequest(req) {
   return req.xhr || req.originalUrl.startsWith('/api/') || accept.includes('application/json');
 }
 
-function requireAuth(req, res, next) {
+export function requireAuth(req, res, next) {
   const user = req.session && req.session.user;
   if (user && user.id) return next();
 
@@ -14,7 +14,7 @@ function requireAuth(req, res, next) {
   return res.redirect('/login');
 }
 
-function requireAdmin(req, res, next) {
+export function requireAdmin(req, res, next) {
   const user = req.session && req.session.user;
   if (user && user.role === 'ADMIN') return next();
 
@@ -24,8 +24,3 @@ function requireAdmin(req, res, next) {
   if (req.flash) req.flash('error', 'Admins only');
   return res.redirect('/properties');
 }
-
-module.exports = {
-  requireAuth,
-  requireAdmin,
-};

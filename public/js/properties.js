@@ -17,15 +17,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-async function loadProperties() {
-    try {
-        const properties = await api('/api/properties');
-        renderProperties(properties);
-    } catch (error) {
-        console.error('Error loading properties:', error);
-        alert('Error loading properties: ' + error.message);
-    }
-}
+// async function loadProperties() {
+//     try {
+//         const properties = await api('/api/properties');
+//         renderProperties(properties);
+//     } catch (error) {
+//         console.error('Error loading properties:', error);
+//         alert('Error loading properties: ' + error.message);
+//     }
+// }
 
 function renderProperties(properties) {
     const tbody = document.getElementById('propertiesTableBody');
@@ -72,65 +72,65 @@ function openPropertyModal() {
     document.getElementById('propertyModal').classList.add('active');
 }
 
-async function editProperty(propertyId) {
-    try {
-        const property = await api(`/api/properties/${propertyId}`);
+// async function editProperty(propertyId) {
+//     try {
+//         const property = await api(`/api/properties/${propertyId}`);
         
-        document.getElementById('propertyModalTitle').textContent = 'Edit Property';
-        document.getElementById('propertyId').value = property._id;
-        document.getElementById('propertyTitle').value = property.title;
-        document.getElementById('propertyAddress').value = property.address;
-        document.getElementById('propertyPrice').value = property.price;
-        document.getElementById('propertyStatus').value = property.status;
-        document.getElementById('propertyImage').value = property.image || '';
+//         document.getElementById('propertyModalTitle').textContent = 'Edit Property';
+//         document.getElementById('propertyId').value = property._id;
+//         document.getElementById('propertyTitle').value = property.title;
+//         document.getElementById('propertyAddress').value = property.address;
+//         document.getElementById('propertyPrice').value = property.price;
+//         document.getElementById('propertyStatus').value = property.status;
+//         document.getElementById('propertyImage').value = property.image || '';
         
-        document.getElementById('propertyModal').classList.add('active');
-    } catch (error) {
-        console.error('Error loading property:', error);
-        alert('Error loading property: ' + error.message);
-    }
-}
+//         document.getElementById('propertyModal').classList.add('active');
+//     } catch (error) {
+//         console.error('Error loading property:', error);
+//         alert('Error loading property: ' + error.message);
+//     }
+// }
 
-async function handlePropertySubmit(e) {
-    e.preventDefault();
+// async function handlePropertySubmit(e) {
+//     e.preventDefault();
     
-    const propertyId = document.getElementById('propertyId').value;
-    const formData = {
-        title: document.getElementById('propertyTitle').value,
-        address: document.getElementById('propertyAddress').value,
-        price: document.getElementById('propertyPrice').value,
-        status: document.getElementById('propertyStatus').value,
-        image: document.getElementById('propertyImage').value
-    };
+//     const propertyId = document.getElementById('propertyId').value;
+//     const formData = {
+//         title: document.getElementById('propertyTitle').value,
+//         address: document.getElementById('propertyAddress').value,
+//         price: document.getElementById('propertyPrice').value,
+//         status: document.getElementById('propertyStatus').value,
+//         image: document.getElementById('propertyImage').value
+//     };
     
-    try {
-        if (propertyId) {
-            // Update existing property
-            await api(`/api/properties/${propertyId}`, 'PUT', formData);
-        } else {
-            // Create new property
-            await api('/api/properties', 'POST', formData);
-        }
+//     try {
+//         if (propertyId) {
+//             // Update existing property
+//             await api(`/api/properties/${propertyId}`, 'PUT', formData);
+//         } else {
+//             // Create new property
+//             await api('/api/properties', 'POST', formData);
+//         }
         
-        closeModals();
-        loadProperties(); // Refresh the list
-    } catch (error) {
-        console.error('Error saving property:', error);
-        alert('Error saving property: ' + error.message);
-    }
-}
+//         closeModals();
+//         loadProperties(); // Refresh the list
+//     } catch (error) {
+//         console.error('Error saving property:', error);
+//         alert('Error saving property: ' + error.message);
+//     }
+// }
 
-async function deleteProperty(propertyId) {
-    if (!confirm('Are you sure you want to delete this property?')) return;
+// async function deleteProperty(propertyId) {
+//     if (!confirm('Are you sure you want to delete this property?')) return;
     
-    try {
-        await api(`/api/properties/${propertyId}`, 'DELETE');
-        loadProperties(); // Refresh the list
-    } catch (error) {
-        console.error('Error deleting property:', error);
-        alert('Error deleting property: ' + error.message);
-    }
-}
+//     try {
+//         await api(`/api/properties/${propertyId}`, 'DELETE');
+//         loadProperties(); // Refresh the list
+//     } catch (error) {
+//         console.error('Error deleting property:', error);
+//         alert('Error deleting property: ' + error.message);
+//     }
+// }
 
 function closeModals() {
     document.getElementById('propertyModal').classList.remove('active');

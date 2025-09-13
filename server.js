@@ -4,8 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-
-
+import propertyRoutes from './src/routes/propertyRoutes.js';
 import connectDB from './src/config/db.js';
 import authRoutes from './src/routes/auth.js';
 import customerRoutes from './src/routes/customers.js';
@@ -22,32 +21,24 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// static
+// static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// db
+// database
 await connectDB();
 
 // routes
 app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/properties', propertyRoutes);
 
 // default pages
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/customer', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tenant.html')));
-app.get('/properties', (req, res) => 
-    res.sendFile(path.join(__dirname, 'public', 'properties.html'))
-  );
-  
-  app.get('/tenants', (req, res) => 
-    res.sendFile(path.join(__dirname, 'public', 'tenants.html'))
-  );
-  
-  app.get('/chat', (req, res) => 
-    res.sendFile(path.join(__dirname, 'public', 'chat.html'))
-  );
-  
+app.get('/properties', (req, res) => res.sendFile(path.join(__dirname, 'public', 'properties.html')));
+app.get('/tenants', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tenants.html')));
+app.get('/chat', (req, res) => res.sendFile(path.join(__dirname, 'public', 'chat.html')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

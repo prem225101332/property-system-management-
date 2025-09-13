@@ -1,8 +1,8 @@
 // controllers/propertyController.js
-const Property = require('../models/Property');
+import Property from '../models/Property.js';
 
-// GET /properties  (list + filters)
-exports.list = async (req, res) => {
+// GET /properties
+export const list = async (req, res) => {
   const { q, status } = req.query;
   const filter = {};
   if (status) filter.status = status;
@@ -17,13 +17,13 @@ exports.list = async (req, res) => {
   res.render('properties/index', { title: 'Properties', properties, query: req.query });
 };
 
-// GET /properties/new (admin)
-exports.newForm = (req, res) => {
+// GET /properties/new
+export const newForm = (req, res) => {
   res.render('properties/new', { title: 'Add Property' });
 };
 
-// POST /properties (admin)
-exports.create = async (req, res) => {
+// POST /properties
+export const create = async (req, res) => {
   const b = req.body;
   const p = await Property.create({
     title: b.title,
@@ -40,21 +40,21 @@ exports.create = async (req, res) => {
 };
 
 // GET /properties/:id
-exports.show = async (req, res) => {
+export const show = async (req, res) => {
   const p = await Property.findById(req.params.id);
   if (!p) return res.status(404).render('404', { title: 'Not Found' });
   res.render('properties/show', { title: p.title, property: p });
 };
 
-// GET /properties/:id/edit (admin)
-exports.editForm = async (req, res) => {
+// GET /properties/:id/edit
+export const editForm = async (req, res) => {
   const p = await Property.findById(req.params.id);
   if (!p) return res.status(404).render('404', { title: 'Not Found' });
   res.render('properties/edit', { title: 'Edit Property', property: p });
 };
 
-// PUT /properties/:id (admin)
-exports.update = async (req, res) => {
+// PUT /properties/:id
+export const update = async (req, res) => {
   const b = req.body;
   await Property.findByIdAndUpdate(req.params.id, {
     title: b.title,
@@ -71,8 +71,8 @@ exports.update = async (req, res) => {
   res.redirect(`/properties/${req.params.id}`);
 };
 
-// DELETE /properties/:id (admin)
-exports.destroy = async (req, res) => {
+// DELETE /properties/:id
+export const destroy = async (req, res) => {
   await Property.findByIdAndDelete(req.params.id);
   req.flash('success', 'Property deleted');
   res.redirect('/properties');

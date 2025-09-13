@@ -1,11 +1,9 @@
 // routes/propertyRoutes.js
-const express = require('express');
-const router = express.Router();
-const ctrl = require('../controllers/propertyController');
+import express from 'express';
+import * as ctrl from '../controllers/propertyController.js';
+import { requireAuth, requireAdmin } from '../utils/auth.js';
 
-// OPTIONAL: your existing auth/role middleware
-const { requireAuth, requireAdmin } = require('../utils/auth'); 
-// If you don't have these yet, see small stub below.
+const router = express.Router();
 
 router.get('/', requireAuth, ctrl.list);
 router.get('/new', requireAuth, requireAdmin, ctrl.newForm);
@@ -15,4 +13,4 @@ router.get('/:id/edit', requireAuth, requireAdmin, ctrl.editForm);
 router.put('/:id', requireAuth, requireAdmin, ctrl.update);
 router.delete('/:id', requireAuth, requireAdmin, ctrl.destroy);
 
-module.exports = router;
+export default router;

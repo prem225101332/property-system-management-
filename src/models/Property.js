@@ -1,5 +1,5 @@
 // models/Property.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const AddressSchema = new mongoose.Schema({
   line1: String,
@@ -11,7 +11,7 @@ const AddressSchema = new mongoose.Schema({
 const PropertySchema = new mongoose.Schema({
   title: { type: String, required: true },
   address: AddressSchema,
-  rent: { type: Number, required: true },            // monthly rent
+  rent: { type: Number, required: true },
   bedrooms: Number,
   bathrooms: Number,
   parking: { type: Boolean, default: false },
@@ -20,4 +20,4 @@ const PropertySchema = new mongoose.Schema({
   description: String,
 }, { timestamps: true });
 
-module.exports = mongoose.model('Property', PropertySchema);
+export default mongoose.model('Property', PropertySchema);
