@@ -5,10 +5,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
-
 import connectDB from './src/config/db.js';
 import authRoutes from './src/routes/auth.js';
 import customerRoutes from './src/routes/customers.js';
+import propertyRoutes from './src/routes/propertyRoutes.js';
 
 dotenv.config();
 
@@ -28,26 +28,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // db
 await connectDB();
 
-// routes
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/properties', propertyRoutes);
 
-// default pages
+// default pages (static HTML)
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/customer', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tenant.html')));
-app.get('/properties', (req, res) => 
-    res.sendFile(path.join(__dirname, 'public', 'properties.html'))
-  );
-  
-  app.get('/tenants', (req, res) => 
-    res.sendFile(path.join(__dirname, 'public', 'tenants.html'))
-  );
-  
-  app.get('/chat', (req, res) => 
-    res.sendFile(path.join(__dirname, 'public', 'chat.html'))
-  );
-  
+app.get('/properties', (req, res) => res.sendFile(path.join(__dirname, 'public', 'properties.html')));
+app.get('/tenants', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tenants.html')));
+app.get('/chat', (req, res) => res.sendFile(path.join(__dirname, 'public', 'chat.html')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

@@ -1,79 +1,102 @@
-// controllers/propertyController.js
-const Property = require('../models/Property');
+// src/controllers/propertyController.js
+import Property from '../models/Property.js';
 
-// GET /properties  (list + filters)
-exports.list = async (req, res) => {
-  const { q, status } = req.query;
-  const filter = {};
-  if (status) filter.status = status;
-  if (q) {
-    filter.$or = [
-      { title: new RegExp(q, 'i') },
-      { description: new RegExp(q, 'i') },
-      { 'address.city': new RegExp(q, 'i') },
-    ];
+/** GET /api/properties (list with optional filters) */
+export const list = async (req, res) => {
+  try {
+    const { q, status } = req.query;
+    const filter = {};
+    if (status) filter.status = status;
+    if (q) {
+      filter.$or = [
+        { title: new RegExp(q, 'i') },
+        { description: new RegExp(q, 'i') },
+        { 'address.city': new RegExp(q, 'i') },
+        { 'address.line1': new RegExp(q, 'i') },
+      ];
+    }
+    const properties = await Property.find(filter).sort('-createdAt');
+    res.json(properties);
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to list properties' });
   }
-  const properties = await Property.find(filter).sort('-createdAt');
-  res.render('properties/index', { title: 'Properties', properties, query: req.query });
 };
 
-// GET /properties/new (admin)
-exports.newForm = (req, res) => {
-  res.render('properties/new', { title: 'Add Property' });
+/** GET /api/properties/:id */
+export const getOne = async (req, res) => {
+  try {
+    const p = await Property.findById(req.params.id);
+    if (!p) return res.status(404).json({ message: 'Not found' });
+    res.json(p);
+  } catch (e) {
+    res.status(400).json({ message: 'Failed to load property' });
+  }
 };
 
-// POST /properties (admin)
-exports.create = async (req, res) => {
-  const b = req.body;
-  const p = await Property.create({
-    title: b.title,
-    address: { line1: b.line1, city: b.city, state: b.state, postcode: b.postcode },
-    rent: Number(b.rent || 0),
-    bedrooms: Number(b.bedrooms || 0),
-    bathrooms: Number(b.bathrooms || 0),
-    parking: !!b.parking,
-    images: (b.images || '').split(',').map(s => s.trim()).filter(Boolean),
-    description: b.description || '',
-  });
-  req.flash('success', 'Property added');
-  res.redirect(`/properties/${p._id}`);
+/** POST /api/properties */
+export const create = async (req, res) => {
+  try {
+    const b = req.body;
+    const p = await Property.create({
+      title: b.title,
+      address: {
+        line1: b.address?.line1 || '',
+        city: b.address?.city || '',
+        state: b.address?.state || '',
+        postcode: b.address?.postcode || '',
+      },
+      rent: Number(b.rent || 0),
+      bedrooms: Number(b.bedrooms || 0),
+      bathrooms: Number(b.bathrooms || 0),
+      parking: !!b.parking,
+      images: Array.isArray(b.images) ? b.images.filter(Boolean) : [],
+      status: b.status || 'AVAILABLE',
+      description: b.description || '',
+    });
+    res.status(201).json(p);
+  } catch (e) {
+    res.status(400).json({ message: e.message || 'Failed to create property' });
+  }
 };
 
-// GET /properties/:id
-exports.show = async (req, res) => {
-  const p = await Property.findById(req.params.id);
-  if (!p) return res.status(404).render('404', { title: 'Not Found' });
-  res.render('properties/show', { title: p.title, property: p });
+/** PUT /api/properties/:id */
+export const update = async (req, res) => {
+  try {
+    const b = req.body;
+    const p = await Property.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: b.title,
+        address: {
+          line1: b.address?.line1 || '',
+          city: b.address?.city || '',
+          state: b.address?.state || '',
+          postcode: b.address?.postcode || '',
+        },
+        rent: Number(b.rent || 0),
+        bedrooms: Number(b.bedrooms || 0),
+        bathrooms: Number(b.bathrooms || 0),
+        parking: !!b.parking,
+        status: b.status || 'AVAILABLE',
+        images: Array.isArray(b.images) ? b.images.filter(Boolean) : [],
+        description: b.description || '',
+      },
+      { new: true }
+    );
+    if (!p) return res.status(404).json({ message: 'Not found' });
+    res.json(p);
+  } catch (e) {
+    res.status(400).json({ message: e.message || 'Failed to update property' });
+  }
 };
 
-// GET /properties/:id/edit (admin)
-exports.editForm = async (req, res) => {
-  const p = await Property.findById(req.params.id);
-  if (!p) return res.status(404).render('404', { title: 'Not Found' });
-  res.render('properties/edit', { title: 'Edit Property', property: p });
-};
-
-// PUT /properties/:id (admin)
-exports.update = async (req, res) => {
-  const b = req.body;
-  await Property.findByIdAndUpdate(req.params.id, {
-    title: b.title,
-    address: { line1: b.line1, city: b.city, state: b.state, postcode: b.postcode },
-    rent: Number(b.rent || 0),
-    bedrooms: Number(b.bedrooms || 0),
-    bathrooms: Number(b.bathrooms || 0),
-    parking: !!b.parking,
-    status: b.status,
-    images: (b.images || '').split(',').map(s => s.trim()).filter(Boolean),
-    description: b.description || '',
-  });
-  req.flash('success', 'Property updated');
-  res.redirect(`/properties/${req.params.id}`);
-};
-
-// DELETE /properties/:id (admin)
-exports.destroy = async (req, res) => {
-  await Property.findByIdAndDelete(req.params.id);
-  req.flash('success', 'Property deleted');
-  res.redirect('/properties');
+/** DELETE /api/properties/:id */
+export const destroy = async (req, res) => {
+  try {
+    const out = await Property.findByIdAndDelete(req.params.id);
+    if (!out) return res.status(404).json({ message: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(400).json({ message: e.message || 'Failed to delete property' });
+  }
 };
