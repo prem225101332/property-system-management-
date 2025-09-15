@@ -1,94 +1,168 @@
-Property Management System
-A comprehensive, web-based Property Management System designed to streamline rental management for property managers and provide a transparent, communicative experience for tenants. Built with the MVC architecture using Node.js, Express, MongoDB, and Materialize CSS.
+# Property Management System (PMS)
 
-🚀 Features
+A simple Property Management System with a Node.js + Express backend, MongoDB (via Mongoose), and static HTML/CSS/JS pages for the UI. Environment variables are managed with `dotenv`, authentication uses JWT and password hashing with `bcryptjs`. The app serves static pages from `/public` and exposes REST APIs for auth, customers (tenants), and properties.
 
-For Admins (Property Managers)
+> This README is generated directly from the project you shared. It only documents what exists in the repository.
 
-Dashboard Overview: View property portfolio, financial metrics, and tenant activity at a glance.
-Property Management: Full CRUD operations for managing properties (add, view, edit, soft delete).
-Tenant Management: Create and manage tenant accounts, assign properties, and view activity logs.
-Billing & Payments: Generate monthly rent bills, track due dates, and monitor outstanding dues.
-Real-Time Chat: Communicate directly with tenants via a WebSocket-powered chat interface.
-Reporting: Generate and export financial and property reports (PDF).
-For Tenants
+---
 
-Personal Dashboard: View current dues, upcoming payments, and payment history.
-Profile Management: Update personal information securely.
-Rental Agreement Access: View assigned property details and rental agreements.
-Direct Communication: Chat in real-time with the property manager.
-🛠️ Tech Stack
+## Tech Stack
 
-Backend: Node.js, Express.js
-Database: MongoDB with Mongoose ODM
-Frontend: HTML5, CSS3, JavaScript, Materialize CSS
-Authentication: JWT (JSON Web Tokens)
-Real-Time Communication: Socket.IO
-Password Hashing: bcryptjs
-📦 Installation & Setup
+- **Runtime:** Node.js (ES Modules)
+- **Server:** Express
+- **Database:** MongoDB with **Mongoose**
+- **Auth:** JWT (`jsonwebtoken`), password hashing with `bcryptjs`
+- **Config:** `.env` via `dotenv`
+- **Logs/CORS:** `morgan`, `cors`
+- **Frontend:** Static **HTML, CSS, JavaScript** (with **Font Awesome** icons & Google Fonts).  
+- **Build/Preview:** Vite (present for dev/preview; static assets are also served by Express)
 
-Follow these steps to set up the project locally:
 
-Clone the repository
-bash
-git clone https://github.com/your-username/property-management-system.git
-cd property-management-system
-Install dependencies
-bash
+
+---
+
+## Project Structure
+
+```
+.
+├─ server.js
+├─ package.json
+├─ .gitignore
+├─ /public
+│  ├─ index.html
+│  ├─ admin.html
+│  ├─ tenant.html
+│  ├─ tenants.html
+│  ├─ properties.html
+│  ├─ chat.html
+│  ├─ /css
+│  └─ /js
+└─ /src
+   ├─ /config
+   │  └─ db.js
+   ├─ /middleware
+   │  └─ auth.js
+   ├─ /models
+   │  ├─ User.js
+   │  ├─ Customer.js
+   │  └─ Property.js
+   ├─ /controllers
+   │  └─ propertyController.js
+   └─ /routes
+      ├─ auth.js
+      ├─ customers.js
+      └─ propertyRoutes.js
+```
+
+---
+
+## Prerequisites
+
+- Node.js 18+
+- A MongoDB connection string (Atlas or local)
+
+---
+
+## Setup & Run
+
+1) **Install dependencies**
+```bash
 npm install
-Environment Variables
-Create a .env file in the root directory and add the following variables:
-env
+```
+
+2) **Create a `.env` file** in the project root:
+```bash
+MONGO_URI=mongodb+srv://<user>:<pass>@<cluster>/<db>?retryWrites=true&w=majority
+JWT_SECRET=your_jwt_secret_here
 PORT=3000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_super_secret_jwt_key
-Replace the values with your actual MongoDB URI and a strong JWT secret.
-Start the development server
-bash
-npm start
-# or for development with auto-restart
-npm run dev
-Open your browser
-Navigate to http://localhost:3000
-📁 Project Structure
+```
 
-text
-property-management-system/
-├── models/                 # MongoDB Mongoose models (User, Property, etc.)
-├── controllers/            # Route controllers (business logic)
-├── routes/                 # Express routes
-├── middleware/             # Custom middleware (auth, validation)
-├── public/                 # Static files (CSS, JS, images)
-│   ├── css/
-│   ├── js/
-│   └── ...
-├── views/                  # EJS or other templating engine files
-├── .env                    # Environment variables (gitignored)
-├── app.js                  # Main application entry point
-└── package.json
-🤝 Contributing
+3) **Start the server**
 
-We welcome contributions! Please follow these steps:
+- Using Node:
+```bash
+node server.js
+```
+- Or, to preview static assets with Vite (optional):
+```bash
+npm run dev          # dev server
+npm run build        # build
+npm run preview      # preview built assets
+```
 
-Fork the Project.
-Create your Feature Branch (git checkout -b feature/AmazingFeature).
-Commit your Changes (git commit -m 'Add some AmazingFeature').
-Push to the Branch (git push origin feature/AmazingFeature).
-Open a Pull Request.
-Please ensure your code follows the project's style and all tests pass.
+> The Express app serves static files from `/public`. Visit:  
+> - http://localhost:3000/ → `index.html` (Auth page)  
+> - http://localhost:3000/admin → `admin.html`  
+> - http://localhost:3000/customer → `tenant.html`  
+> - http://localhost:3000/properties → `properties.html`  
+> - http://localhost:3000/tenants → `tenants.html`  
+> - http://localhost:3000/chat → `chat.html`  
 
-📄 License
+---
 
-This project is licensed under the Apache License - see the LICENSE.md file for details.
+## API Overview
 
-👨‍💻 Team
+### Auth (`/api/auth`)
+- `POST /register` — create user (role: `Admin` or `Tenant`), stores hashed password
+- `POST /login` — returns JWT (`Authorization: Bearer <token>`)
 
-Prem Kumar
-Akhileshwar Reddy
-Srikar Boske
-Durga Reddy
-🙏 Acknowledgments
+### Customers (`/api/customers`) — protected
+- Admin-only examples:
+  - `POST /` — create customer
+  - `GET /` — list customers (supports soft-delete flag in schema)
+  - `PUT /:id`, `DELETE /:id` — update / delete
+- Tenant self-service examples:
+  - `GET /me` — fetch the logged-in tenant’s record
+  - `POST /me/mark-paid` — mark current month as paid
 
-Based on the IEEE Standard for Software Requirements Specifications (IEEE Std 830-1998).
+*Middleware used:* `authRequired` and `requireRole(...)` from `src/middleware/auth.js`.
+
+### Properties (`/api/properties`) — protected
+- `GET /` — list (filters: `?q=<text>&status=AVAILABLE|OCCUPIED`)
+- `GET /:id` — fetch one
+- `POST /` — create (admin)
+- `PUT /:id` — update (admin)
+- `DELETE /:id` — delete (admin)
+
+> Note: `src/routes/propertyRoutes.js` currently includes temporary pass-through middlewares (`requireAuth`, `requireAdmin` stubs). Replace them with real ones (like in `middleware/auth.js`) for production.
+
+---
+
+## Scripts
+
+From `package.json`:
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
+```
+There is no `"start"` script; run `node server.js` to launch Express.
+
+---
+
+## Environment & Git
+
+- `.gitignore` already excludes `node_modules/`, `.env`, logs, etc.
+- **Do not commit `.env`.**
+
+---
+
+## Team
+
+- Durga Reddy
+- Akhileshwar Reddy
+- Prem Kumar
+- Srikar Boske
+
+---
+
+## License
+
+See `LICENSE` in the repository.
+nts Specifications (IEEE Std 830-1998).
 Materialize CSS framework for the UI components.
 Icons from Material Icons.
