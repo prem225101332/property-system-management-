@@ -24,34 +24,60 @@ A simple Property Management System with a Node.js + Express backend, MongoDB (v
 ## Project Structure
 
 ```
-.
-├─ server.js
-├─ package.json
-├─ .gitignore
-├─ /public
-│  ├─ index.html
-│  ├─ admin.html
-│  ├─ tenant.html
-│  ├─ tenants.html
-│  ├─ properties.html
-│  ├─ chat.html
-│  ├─ /css
-│  └─ /js
-└─ /src
-   ├─ /config
-   │  └─ db.js
-   ├─ /middleware
-   │  └─ auth.js
-   ├─ /models
-   │  ├─ User.js
-   │  ├─ Customer.js
-   │  └─ Property.js
-   ├─ /controllers
-   │  └─ propertyController.js
-   └─ /routes
-      ├─ auth.js
-      ├─ customers.js
-      └─ propertyRoutes.js
+├── Client-Side Files
+│   ├── CSS/
+│   │   ├── admin.css
+│   │   ├── dashboard.css
+│   │   ├── style.css
+│   │   └── tenant.css
+│   ├── JS/
+│   │   ├── admin.js
+│   │   ├── auth.js
+│   │   ├── chat.js
+│   │   ├── common.js
+│   │   ├── dashboard.js
+│   │   ├── data-manager.js
+│   │   ├── properties.js
+│   │   ├── script.js
+│   │   ├── tenant.js
+│   │   └── tenants.js
+│   └── HTML Pages/
+│       ├── addtenant.html
+│       ├── admin-issues.html
+│       ├── admin.html
+│       ├── chat.html
+│       ├── index.html
+│       ├── properties.html
+│       ├── tenant-issues.html
+│       ├── tenant-property.html
+│       └── tenantdashboard.html
+└── Server-Side Files
+    ├── config/
+    │   └── db.js
+    ├── controllers/
+    │   ├── addtenantController.js
+    │   ├── issueController.js
+    │   └── propertyController.js
+    ├── middleware/
+    │   └── auth.js
+    ├── models/
+    │   ├── Addtenant.js
+    │   ├── Customer.js
+    │   ├── Issue.js
+    │   ├── Property.js
+    │   └── User.js
+    ├── routes/
+    │   ├── addTenantRoutes.js
+    │   ├── auth.js
+    │   ├── customers.js
+    │   ├── issueRoutes.js
+    │   └── propertyRoutes.js
+    ├── utils/
+    │   └── auth.js
+    ├── package.json
+    ├── package-lock.json
+    ├── server.js
+    └── README.md
 ```
 
 ---
@@ -102,29 +128,32 @@ npm run preview      # preview built assets
 
 ## API Overview
 
-### Auth (`/api/auth`)
-- `POST /register` — create user (role: `Admin` or `Tenant`), stores hashed password
-- `POST /login` — returns JWT (`Authorization: Bearer <token>`)
+API Endpoints
 
-### Customers (`/api/customers`) — protected
-- Admin-only examples:
-  - `POST /` — create customer
-  - `GET /` — list customers (supports soft-delete flag in schema)
-  - `PUT /:id`, `DELETE /:id` — update / delete
-- Tenant self-service examples:
-  - `GET /me` — fetch the logged-in tenant’s record
-  - `POST /me/mark-paid` — mark current month as paid
+Authentication
 
-*Middleware used:* `authRequired` and `requireRole(...)` from `src/middleware/auth.js`.
+POST /api/auth/login - User login
+POST /api/auth/register - User registration
+POST /api/auth/logout - User logout
+Properties
 
-### Properties (`/api/properties`) — protected
-- `GET /` — list (filters: `?q=<text>&status=AVAILABLE|OCCUPIED`)
-- `GET /:id` — fetch one
-- `POST /` — create (admin)
-- `PUT /:id` — update (admin)
-- `DELETE /:id` — delete (admin)
+GET /api/properties - Get all properties
+POST /api/properties - Create new property
+PUT /api/properties/:id - Update property
+DELETE /api/properties/:id - Delete property
+Tenants
 
-> Note: `src/routes/propertyRoutes.js` currently includes temporary pass-through middlewares (`requireAuth`, `requireAdmin` stubs). Replace them with real ones (like in `middleware/auth.js`) for production.
+GET /api/tenants - Get all tenants
+POST /api/tenants - Add new tenant
+PUT /api/tenants/:id - Update tenant
+DELETE /api/tenants/:id - Remove tenant
+Issues
+
+GET /api/issues - Get all issues
+POST /api/issues - Create new issue
+PUT /api/issues/:id - Update issue status
+DELETE /api/issues/:id - Delete issue
+
 
 ---
 
