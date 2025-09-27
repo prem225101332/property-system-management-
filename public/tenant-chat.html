@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Property Management System - Tenant Dashboard</title>
+    <title>Property Management System - Chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -47,7 +47,6 @@
             overflow-x: hidden;
         }
 
-        /* Layout */
         .sidebar {
             position: fixed;
             width: var(--sidebar-width);
@@ -62,10 +61,10 @@
         .main-content {
             margin-left: var(--sidebar-width);
             min-height: 100vh;
-            padding: 0;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Updated sidebar styling to match admin design */
         .sidebar-header {
             padding: 0 1.5rem 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -136,7 +135,6 @@
             padding-top: 1rem;
         }
 
-        /* Header Styles */
         .header {
             display: flex;
             justify-content: space-between;
@@ -178,110 +176,117 @@
             text-decoration: none;
         }
 
-        /* Dashboard Content */
-        .dashboard-content {
-            padding: 2rem;
-        }
-
-        /* Toolbar */
-        .toolbar {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            align-items: center;
-        }
-
-        input[type="search"] {
-            flex: 1;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-        }
-
-        input[type="search"]:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        select {
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            background: var(--bg-card);
-            font-size: 1rem;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Properties Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
+        .chat-section {
             background: var(--bg-card);
             border-radius: var(--border-radius);
             padding: 1.5rem;
             box-shadow: var(--shadow-sm);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 200px);
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
         }
 
-        .card h3 {
-            margin: 0 0 0.5rem;
-            font-size: 1.2rem;
+        .chat-header {
+            padding: 1rem;
+            background: #f9fafb;
+            border-bottom: 1px solid var(--border-color);
             font-weight: 600;
         }
 
-        .muted {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: var(--bg-card);
         }
 
-        .price {
-            font-weight: 700;
-            margin-top: 0.75rem;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-
-        .imgwrap {
-            width: 100%;
-            aspect-ratio: 4 / 3;
-            overflow: hidden;
-            border-radius: calc(var(--border-radius) - 2px);
-            background: #f3f4f6;
+        .message {
             margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            max-width: 80%;
+        }
+
+        .message.tenant {
+            background: var(--primary);
+            color: var(--text-white);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.landlord {
+            background: #f3f4f6;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            background: #f9fafb;
+            gap: 0.5rem;
         }
 
-        .imgwrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+        .chat-input textarea {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            resize: vertical;
+            min-height: 50px;
+            max-height: 120px;
+            font-family: inherit;
         }
 
-        .empty {
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--text-white);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: var(--primary-dark);
+        }
+
+        .chat-input button:disabled {
+            background: var(--secondary);
+            cursor: not-allowed;
+        }
+
+        .empty-chat {
             text-align: center;
-            padding: 3rem 1rem;
             color: var(--text-secondary);
-            font-size: 1.1rem;
+            font-size: 1rem;
+            padding: 2rem;
         }
 
-        /* Responsive Styles */
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -330,17 +335,12 @@
                 justify-content: space-between;
             }
             
-            .dashboard-content {
-                padding: 1rem;
+            .chat-section {
+                margin: 1rem;
             }
             
-            .toolbar {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            
-            .grid {
-                grid-template-columns: 1fr;
+            .message {
+                max-width: 90%;
             }
         }
 
@@ -362,7 +362,7 @@
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-label">TENANT PORTAL</div>
-                <a href="./tenantdashboard.html" class="nav-item active">
+                <a href="./tenantdashboard.html" class="nav-item">
                     <i class="fas fa-chart-pie"></i>
                     <span>Dashboard</span>
                 </a>
@@ -370,12 +370,12 @@
                     <i class="fas fa-tools"></i>
                     <span>Issues</span>
                 </a>
-                <a href="./tenant-chat.html" class="nav-item">
+                <a href="./tenant-chat.html" class="nav-item active">
                     <i class="fas fa-envelope"></i>
                     <span>Chat</span>
                 </a>
                 <div class="sign-out">
-                    <a href="./index.html" class="nav-item" id="logoutBtn">
+                    <a href="./index.html" class="nav-item">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Sign Out</span>
                     </a>
@@ -387,8 +387,8 @@
     <div class="main-content">
         <header class="header">
             <div class="header-left">
-                <h1>Dashboard</h1>
-                <p>Welcome back! Here's your property overview.</p>
+                <h1>Chat</h1>
+                <p>Communicate with your landlord.</p>
             </div>
             <div class="header-right">
                 <div class="user-profile">
@@ -397,23 +397,81 @@
             </div>
         </header>
 
-        <div class="dashboard-content">
-            <div class="toolbar">
-                <input id="searchBox" type="search" placeholder="Search by city, address, or title..." />
-                <select id="statusFilter">
-                    <option value="">All</option>
-                    <option value="AVAILABLE" selected>AVAILABLE</option>
-                    <option value="OCCUPIED">OCCUPIED</option>
-                </select>
-            </div>
-
-            <div id="properties" class="grid"></div>
-            <div id="emptyState" class="empty" style="display:none;">
-                No properties found.
+        <div class="chat-section">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <i class="fas fa-comments"></i> Chat with Landlord
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-chat">
+                        No messages yet. Start a conversation with your landlord.
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Type your message here..."
+                        rows="2"
+                    ></textarea>
+                    <button id="sendBtn">Send</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="./js/tenantdashboard.js" defer></script>
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(text, sender = 'tenant') {
+            const emptyChat = chatMessages.querySelector('.empty-chat');
+            if (emptyChat) {
+                emptyChat.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'tenant');
+            messageInput.value = '';
+            
+            messageInput.style.height = 'auto';
+            
+            setTimeout(() => {
+                addMessage("Thank you for your message. I'll get back to you soon.", 'landlord');
+            }, 1000);
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+    </script>
 </body>
 </html>
