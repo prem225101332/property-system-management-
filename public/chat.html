@@ -12,7 +12,7 @@
         <div class="sidebar-header">
             <div class="logo">
                 <i class="fas fa-building"></i>
-                <span>PropertyHub</span>
+                <span>Property</span>
             </div>
             <div class="subtitle">Management System</div>
         </div>
@@ -28,7 +28,7 @@
                     <i class="fas fa-home"></i>
                     <span>Properties</span>
                 </a>
-                <a href="/tenants" class="nav-item">
+                <a href="./addtenant.html" class="nav-item">
                     <i class="fas fa-users"></i>
                     <span>Tenants</span>
                 </a>
@@ -36,8 +36,11 @@
                     <i class="fas fa-envelope"></i>
                     <span>Messages</span>
                 </a>
+                <a href="/admin-issues.html" class="nav-item active">
+                    <i class="fas fa-tools"></i><span>Issues</span>
+                </a>
                 <div class="sign-out">
-                    <a href="/logout" class="nav-item">
+                    <a href="index.html" class="nav-item">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Sign Out</span>
                     </a>
@@ -60,10 +63,6 @@
         </header>
 
         <div class="chat-section">
-            <div class="section-header">
-                <h3>Messages</h3>
-                <p>Communicate with your tenants</p>
-            </div>
             <div class="chat-container">
                 <div class="chat-header">
                     <h4>Tenant Communications</h4>
@@ -83,6 +82,12 @@
                     </div>
                 </div>
                 <div class="chat-input">
+                    <select id="userSelect">
+                        <option value="" disabled selected>Select User</option>
+                        <option value="Mike">Mike</option>
+                        <option value="Sarah">Sarah</option>
+                        <option value="John">John</option>
+                    </select>
                     <input type="text" id="messageInput" placeholder="Type your message...">
                     <button id="sendMessageBtn">Send</button>
                 </div>
@@ -90,7 +95,57 @@
         </div>
     </div>
 
-    <script src="/js/common.js"></script>
-    <script src="/js/chat.js"></script>
+    <script>
+        const sendBtn = document.getElementById("sendMessageBtn");
+        const messageInput = document.getElementById("messageInput");
+        const chatMessages = document.getElementById("chatMessages");
+        const userSelect = document.getElementById("userSelect");
+      
+        // Load tenants into dropdown on page load
+        async function loadTenants() {
+          try {
+            const res = await fetch('/api/tenants');
+            const tenants = await res.json();
+      
+            userSelect.innerHTML = '<option value="" disabled selected>Select User</option>';
+      
+            tenants.forEach(t => {
+              const opt = document.createElement("option");
+              opt.value = t._id; // store tenant ID
+              opt.textContent = `${t.name} (${t.email})`;
+              userSelect.appendChild(opt);
+            });
+      
+          } catch (err) {
+            console.error("Error loading tenants:", err);
+            alert("Failed to load tenants.");
+          }
+        }
+      
+        // Handle send button click
+        sendBtn.addEventListener("click", () => {
+          const message = messageInput.value.trim();
+          const selectedUserId = userSelect.value;
+          const selectedUserName = userSelect.options[userSelect.selectedIndex]?.text;
+      
+          if (message && selectedUserId) {
+            const newMessage = document.createElement("div");
+            newMessage.classList.add("message", "sent");
+            newMessage.innerHTML = `<p>To ${selectedUserName}: ${message}</p>
+              <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+            
+            chatMessages.appendChild(newMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+            messageInput.value = "";
+          } else {
+            alert("Please select a user and type a message before sending.");
+          }
+        });
+      
+        // Run on page load
+        loadTenants();
+    </script>
+      
 </body>
 </html>
