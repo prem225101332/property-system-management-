@@ -66,6 +66,10 @@ app.get('/api/tenants', async (req, res) => {
   }
 });
 
+app.get('/tenant-issues', (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'tenant-issues.html'))
+);
+
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
