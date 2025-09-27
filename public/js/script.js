@@ -116,7 +116,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
     localStorage.setItem("token", result.token)
 
-    const redirectUrl = result.user?.role === "Admin" ? "/admin.html" : "/tenant.html"
+    const redirectUrl = result.user?.role === "Admin" ? "/admin.html" : "/tenantdashboard.html"
     window.location.href = redirectUrl
   } catch (error) {
     showMessage("login-message", error.message, true)

@@ -1,3 +1,4 @@
+// src/models/AddTenant.js
 import mongoose from 'mongoose';
 
 const AddTenantSchema = new mongoose.Schema(
@@ -21,4 +22,4 @@ const AddTenantSchema = new mongoose.Schema(
 AddTenantSchema.index({ email: 1 });
 AddTenantSchema.index({ property: 1 });
 
-export default mongoose.model('AddTenant', AddTenantSchema);
+export default mongoose.models.AddTenant || mongoose.model('AddTenant', AddTenantSchema);
