@@ -1,11 +1,34 @@
-// src/controllers/addTenantController.js
 import AddTenant from '../models/AddTenant.js';
 import Property from '../models/Property.js';
+import User from '../models/User.js';
+import mongoose from 'mongoose';
+
+export async function listTenantUsers(req, res) {
+  try {
+    const users = await User.find({ role: 'Tenant' }).select('name email role');
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch tenant users', error: err.message });
+  }
+}
 
 export async function listAddTenants(req, res) {
   try {
-    const tenants = await AddTenant.find().populate('property', 'title name address');
-    res.json(tenants);
+    const users = await User.find({ role: 'Tenant' }).select('name email');
+    const assigns = await AddTenant.find().populate('property', 'title name address').populate('user', 'name email');
+    const map = new Map(assigns.map(a => [String(a.user?._id || ''), a]));
+    const out = users.map(u => {
+      const a = map.get(String(u._id));
+      return {
+        user: { _id: u._id, name: u.name, email: u.email },
+        _id: a?._id || null,
+        phone: a?.phone || '',
+        rent: a?.rent ?? 0,
+        status: a?.status || 'paid',
+        property: a?.property || null
+      };
+    });
+    res.json(out);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch tenants', error: err.message });
   }
@@ -13,61 +36,77 @@ export async function listAddTenants(req, res) {
 
 export async function getAddTenant(req, res) {
   try {
-    const tenant = await AddTenant.findById(req.params.id).populate('property', 'title name address');
-    if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
-    res.json(tenant);
+    const id = req.params.id;
+    if (!mongoose.isValidObjectId(id)) return res.status(400).json({ message: 'Invalid id' });
+    const doc = await AddTenant.findById(id).populate('property', 'title name address').populate('user', 'name email');
+    if (!doc) return res.status(404).json({ message: 'Assignment not found' });
+    res.json(doc);
   } catch (err) {
-    res.status(400).json({ message: 'Invalid tenant id', error: err.message });
+    res.status(400).json({ message: 'Invalid id', error: err.message });
   }
 }
 
-export async function createAddTenant(req, res) {
+export async function upsertAddTenant(req, res) {
   try {
-    const { name, email, phone, rent, status = 'paid', propertyId } = req.body;
-    if (!name || !email || !phone || !propertyId || rent == null) {
-      return res.status(400).json({ message: 'name, email, phone, rent, propertyId are required' });
-    }
-    const prop = await Property.findById(propertyId);
-    if (!prop) return res.status(404).json({ message: 'Property not found' });
+    const { userId, phone, rent, status = 'paid', propertyId } = req.body;
+    if (!userId) return res.status(400).json({ message: 'userId is required' });
+    const user = await User.findOne({ _id: userId, role: 'Tenant' });
+    if (!user) return res.status(404).json({ message: 'Tenant user not found' });
 
-    const tenant = await AddTenant.create({ name, email, phone, rent, status, property: propertyId });
-    const populated = await tenant.populate('property', 'title name address');
-    res.status(201).json(populated);
+    let property = null;
+    if (propertyId) {
+      property = await Property.findById(propertyId);
+      if (!property) return res.status(404).json({ message: 'Property not found' });
+    }
+
+    const update = {
+      user: userId,
+      phone: phone ?? '',
+      rent: rent ?? 0,
+      status: status || 'paid',
+      property: property ? property._id : undefined
+    };
+
+    const doc = await AddTenant.findOneAndUpdate(
+      { user: userId },
+      update,
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    ).populate('property', 'title name address').populate('user', 'name email');
+
+    res.status(200).json(doc);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create tenant', error: err.message });
+    res.status(500).json({ message: 'Failed to save assignment', error: err.message });
   }
 }
 
 export async function updateAddTenant(req, res) {
   try {
-    const { name, email, phone, rent, status, propertyId } = req.body;
+    const { phone, rent, status, propertyId } = req.body;
     const update = {};
-    if (name !== undefined) update.name = name;
-    if (email !== undefined) update.email = email;
     if (phone !== undefined) update.phone = phone;
     if (rent !== undefined) update.rent = rent;
     if (status !== undefined) update.status = status;
     if (propertyId !== undefined) {
       const prop = await Property.findById(propertyId);
       if (!prop) return res.status(404).json({ message: 'Property not found' });
-      update.property = propertyId;
+      update.property = prop._id;
     }
-
     const tenant = await AddTenant.findByIdAndUpdate(req.params.id, update, { new: true })
-      .populate('property', 'title name address');
-    if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
+      .populate('property', 'title name address')
+      .populate('user', 'name email');
+    if (!tenant) return res.status(404).json({ message: 'Assignment not found' });
     res.json(tenant);
   } catch (err) {
-    res.status(400).json({ message: 'Failed to update tenant', error: err.message });
+    res.status(400).json({ message: 'Failed to update', error: err.message });
   }
 }
 
-export async function deleteAddTenant (req, res) {
+export async function deleteAddTenant(req, res) {
   try {
-    const tenant = await AddTenant.findByIdAndDelete(req.params.id);
-    if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
+    const doc = await AddTenant.findByIdAndDelete(req.params.id);
+    if (!doc) return res.status(404).json({ message: 'Assignment not found' });
     res.json({ ok: true });
   } catch (err) {
-    res.status(400).json({ message: 'Failed to delete tenant', error: err.message });
+    res.status(400).json({ message: 'Failed to delete', error: err.message });
   }
 }

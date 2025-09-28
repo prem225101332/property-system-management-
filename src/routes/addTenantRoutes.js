@@ -1,16 +1,19 @@
+// src/routes/addTenantRoutes.js
 import { Router } from 'express';
-import {listAddTenants, getAddTenant, createAddTenant, updateAddTenant, deleteAddTenant} from '../controllers/addTenantController.js';
+import {
+  listTenantUsers,
+  listAddTenants,
+  getAddTenant,
+  upsertAddTenant,
+  updateAddTenant,
+  deleteAddTenant
+} from '../controllers/addTenantController.js';
 
-
-const router = Router();
-
-const requireAuth = (req, _res, next) => next();
-const requireAdmin = (req, _res, next) => next();
-
-router.get('/',requireAuth, listAddTenants); 
-router.get('/:id', getAddTenant);
-router.post('/', createAddTenant);
-router.put('/:id', updateAddTenant);
-router.delete('/:id', deleteAddTenant);
-
-export default router;
+const r = Router();
+r.get('/addtenants/tenant-users', listTenantUsers);
+r.get('/addtenants', listAddTenants);
+r.get('/addtenants/:id', getAddTenant);
+r.post('/addtenants/upsert', upsertAddTenant);
+r.put('/addtenants/:id', updateAddTenant);
+r.delete('/addtenants/:id', deleteAddTenant);
+export default r;
