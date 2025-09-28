@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Property Management System - Messages</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="/css/admin.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="/css/admin.css" rel="stylesheet" />
 </head>
 <body>
     <div class="sidebar">
@@ -16,7 +16,7 @@
             </div>
             <div class="subtitle">Management System</div>
         </div>
-        
+
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <div class="nav-label">MANAGEMENT</div>
@@ -68,84 +68,20 @@
                     <h4>Tenant Communications</h4>
                 </div>
                 <div class="chat-messages" id="chatMessages">
-                    <div class="message received">
-                        <p>Hi, I wanted to ask about the maintenance request I submitted last week.</p>
-                        <span class="message-time">10:30 AM</span>
-                    </div>
-                    <div class="message sent">
-                        <p>Hello Mike, we've scheduled it for this Thursday.</p>
-                        <span class="message-time">10:32 AM</span>
-                    </div>
-                    <div class="message received">
-                        <p>Great, thank you for the update!</p>
-                        <span class="message-time">10:33 AM</span>
-                    </div>
+                    <!-- Messages will be dynamically loaded here -->
                 </div>
                 <div class="chat-input">
-                    <select id="userSelect">
+                    <select id="userSelect" aria-label="Select Tenant">
                         <option value="" disabled selected>Select User</option>
-                        <option value="Mike">Mike</option>
-                        <option value="Sarah">Sarah</option>
-                        <option value="John">John</option>
                     </select>
-                    <input type="text" id="messageInput" placeholder="Type your message...">
+                    <input type="text" id="messageInput" placeholder="Type your message..." aria-label="Message input" />
                     <button id="sendMessageBtn">Send</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const sendBtn = document.getElementById("sendMessageBtn");
-        const messageInput = document.getElementById("messageInput");
-        const chatMessages = document.getElementById("chatMessages");
-        const userSelect = document.getElementById("userSelect");
-      
-        // Load tenants into dropdown on page load
-        async function loadTenants() {
-          try {
-            const res = await fetch('/api/tenants');
-            const tenants = await res.json();
-      
-            userSelect.innerHTML = '<option value="" disabled selected>Select User</option>';
-      
-            tenants.forEach(t => {
-              const opt = document.createElement("option");
-              opt.value = t._id; // store tenant ID
-              opt.textContent = `${t.name} (${t.email})`;
-              userSelect.appendChild(opt);
-            });
-      
-          } catch (err) {
-            console.error("Error loading tenants:", err);
-            alert("Failed to load tenants.");
-          }
-        }
-      
-        // Handle send button click
-        sendBtn.addEventListener("click", () => {
-          const message = messageInput.value.trim();
-          const selectedUserId = userSelect.value;
-          const selectedUserName = userSelect.options[userSelect.selectedIndex]?.text;
-      
-          if (message && selectedUserId) {
-            const newMessage = document.createElement("div");
-            newMessage.classList.add("message", "sent");
-            newMessage.innerHTML = `<p>To ${selectedUserName}: ${message}</p>
-              <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
-            
-            chatMessages.appendChild(newMessage);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-      
-            messageInput.value = "";
-          } else {
-            alert("Please select a user and type a message before sending.");
-          }
-        });
-      
-        // Run on page load
-        loadTenants();
-    </script>
-      
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/js/chat.js"></script>
 </body>
 </html>

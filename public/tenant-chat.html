@@ -419,59 +419,98 @@
         </div>
     </div>
 
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
+        const socket = io();
+        const tenantId = "tenant123"; // replace with actual tenant ID in production
+        socket.emit("registerUser", tenantId);
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }        
+
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
 
-        function addMessage(text, sender = 'tenant') {
+        function addMessage(text, sender) {
             const emptyChat = chatMessages.querySelector('.empty-chat');
-            if (emptyChat) {
-                emptyChat.remove();
-            }
-
+            if (emptyChat) emptyChat.remove();
+        
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            
+        
+            if(sender === "tenant"){
+                messageDiv.style.backgroundColor = "#2563eb"; // blue
+                messageDiv.style.color = "#ffffff";
+                messageDiv.style.marginLeft = "auto";
+                messageDiv.style.textAlign = "right";
+            } else {
+                messageDiv.style.backgroundColor = "#f3f4f6"; // gray
+                messageDiv.style.color = "#000000";
+                messageDiv.style.marginRight = "auto";
+                messageDiv.style.textAlign = "left";
+            }
+        
             const now = new Date();
             const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
+        
             messageDiv.innerHTML = `
-                <div>${text}</div>
+                <div>${escapeHtml(text)}</div>
                 <div class="message-time">${timeString}</div>
             `;
-            
+        
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }        
+
+        async function loadHistory() {
+            const res = await fetch(`/api/messages/${tenantId}`);
+            const messages = await res.json();
+            messages.forEach(msg => {
+              addMessage(
+                msg.message,
+                msg.senderId === tenantId ? "tenant" : "landlord"
+              );
+            });
         }
+        
+        document.addEventListener("DOMContentLoaded", loadHistory);
+
+        socket.on("receiveMessage", (message) => {
+            const senderType = message.senderType === "tenant" ? "tenant" : "landlord";
+            addMessage(message.message, senderType);
+        });        
 
         function sendMessage() {
             const text = messageInput.value.trim();
             if (!text) return;
-
-            addMessage(text, 'tenant');
-            messageInput.value = '';
-            
-            messageInput.style.height = 'auto';
-            
-            setTimeout(() => {
-                addMessage("Thank you for your message. I'll get back to you soon.", 'landlord');
-            }, 1000);
-        }
+        
+            // Only emit, don't call addMessage
+            socket.emit("sendMessage", {
+                senderId: tenantId,
+                senderType: "tenant",
+                receiverId: "admin",
+                receiverType: "admin",
+                message: text
+            });
+        
+            messageInput.value = "";
+        }                     
 
         sendBtn.addEventListener('click', sendMessage);
-
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
             }
         });
-
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-        });
     </script>
+
 </body>
 </html>

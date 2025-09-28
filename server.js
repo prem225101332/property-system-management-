@@ -13,6 +13,7 @@ import customerRoutes from './src/routes/customers.js';
 import propertyRoutes from './src/routes/propertyRoutes.js';
 import issueRoutes from './src/routes/issueRoutes.js';
 import addTenantRoutes from './src/routes/addTenantRoutes.js';
+import messageRoutes from './src/routes/messageRoutes.js';
 
 import Message from './src/models/Message.js';
 import AddTenant from './src/models/AddTenant.js';
@@ -37,6 +38,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/issues', issueRoutes);
 app.use('/api', addTenantRoutes);
+app.use('/api/messages', messageRoutes);
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
@@ -59,29 +61,34 @@ app.get('/api/tenants', async (req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-let onlineUsers = {};
 
-io.on('connection', (socket) => {
-  socket.on('registerUser', (userId) => {
-    onlineUsers[userId] = socket.id;
-  });
+io.on("connection", (socket) => {
+  console.log("User connected");
 
-  socket.on('sendMessage', async ({ sender, receiver, message }) => {
+  socket.on("sendMessage", async (data) => {
     try {
-      const newMessage = new Message({ sender, receiver, message });
+      const { senderId, senderType, receiverId, receiverType, message } = data;
+
+      // Save to MongoDB
+      const newMessage = new Message({
+        senderId,
+        senderType,
+        receiverId,
+        receiverType,
+        message
+      });
       await newMessage.save();
-      if (onlineUsers[receiver]) io.to(onlineUsers[receiver]).emit('receiveMessage', newMessage);
-      io.to(socket.id).emit('receiveMessage', newMessage);
-    } catch {}
+
+      // Emit to the receiver (admin or tenant)
+      io.emit("receiveMessage", newMessage); 
+      // (Later you can target specific rooms instead of broadcasting to all)
+    } catch (err) {
+      console.error("Error saving message:", err);
+    }
   });
 
-  socket.on('disconnect', () => {
-    for (const userId in onlineUsers) {
-      if (onlineUsers[userId] === socket.id) {
-        delete onlineUsers[userId];
-        break;
-      }
-    }
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
   });
 });
 
