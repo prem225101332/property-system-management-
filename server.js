@@ -17,6 +17,7 @@ import messageRoutes from './src/routes/messageRoutes.js';
 
 import Message from './src/models/Message.js';
 import AddTenant from './src/models/AddTenant.js';
+import User from './src/models/User.js';
 
 dotenv.config();
 
@@ -51,12 +52,15 @@ app.get('/tenant-issues', (req, res) => res.sendFile(path.join(__dirname, 'publi
 
 app.get('/api/tenants', async (req, res) => {
   try {
-    const tenants = await AddTenant.find({}, 'name email');
+    // Find users where role = Tenant
+    const tenants = await User.find({ role: "Tenant" }, "name email");
     res.json(tenants);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching tenants:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });

@@ -12,7 +12,7 @@ function formatTime(date) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // loadTenants();
+    loadTenants();
 
     // Register admin as "admin" user
     socket.emit("registerUser", "admin");
@@ -26,6 +26,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Enter') sendMessage();
     });
 });
+
+async function loadTenants() {
+    try {
+        const res = await fetch("/api/tenants");
+        const tenants = await res.json();
+        const userSelect = document.getElementById("userSelect");
+
+        tenants.forEach(t => {
+            const option = document.createElement("option");
+            option.value = t._id;
+            option.textContent = `${t.name} (${t.email})`;
+            userSelect.appendChild(option);
+        });
+    } catch (err) {
+        console.error("Error loading tenants:", err);
+    }
+}
 
 function renderSingleMessage(message, direction) {
     const messagesContainer = document.getElementById('chatMessages');
@@ -54,41 +71,23 @@ function renderSingleMessage(message, direction) {
 //       loadMessagesForTenant(tenantId);
 //     });
 // });
-  
-// async function loadTenants() {
-//     try {
-//         const res = await fetch("/api/tenants");
-//         const tenants = await res.json();
-//         const userSelect = document.getElementById("userSelect");
 
-//         tenants.forEach(t => {
-//             const option = document.createElement("option");
-//             option.value = t._id;
-//             option.textContent = `${t.name} (${t.email})`;
-//             userSelect.appendChild(option);
-//         });
-//     } catch (err) {
-//         console.error("Error loading tenants:", err);
-//     }
-// }
 
 function sendMessage() {
     const input = document.getElementById('messageInput');
-    //const userSelect = document.getElementById('userSelect');
+    const userSelect = document.getElementById('userSelect');
     const message = input.value.trim();
-    //const selectedUserId = userSelect.value;
+    const selectedUserId = userSelect.value;
 
-    if (!message) return;
-
-    // For now, just target a fixed tenantId (replace with real tenant._id you want to test with)
-    const tenantId = "68d626fe2bb5f9794fd92b15"; 
-
-   // if (!message || !selectedUserId) return;
+    if (!message || !selectedUserId) {
+        alert("Please select a tenant and type a message.");
+        return;
+    }
 
     socket.emit("sendMessage", {
         senderId: "admin",
         senderType: "admin",
-        receiverId: tenantId,
+        receiverId: selectedUserId,
         receiverType: "tenant",
         message
       });      
