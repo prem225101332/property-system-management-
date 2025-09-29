@@ -97,12 +97,16 @@ io.on("connection", (socket) => {
             return;
         }
 
+        const senderUser = await User.findById(senderId).lean();
+        const senderName = senderUser ? senderUser.name : "Unknown";
+
         const newMessage = new Message({
-            senderId,
-            senderType,
-            receiverId,
-            receiverType,
-            message
+          senderId,
+          senderType,
+          senderName,
+          receiverId,
+          receiverType,
+          message
         });
         
         await newMessage.save();
