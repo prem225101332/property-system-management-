@@ -125,6 +125,7 @@ socket.on("connect", () => {
     }
 });
 
+
 socket.on("receiveMessage", (message) => {
     if (selectedTenantId && (message.senderId === selectedTenantId || message.receiverId === selectedTenantId)) {
         const direction = message.senderType === "admin" ? "sent" : "received";
@@ -134,7 +135,12 @@ socket.on("receiveMessage", (message) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadTenants();
-    await fetchAdminId();
+    adminId = await fetchAdminId(); // ensure adminId is set
+
+    if (adminId) {
+        socket.emit("registerUser", adminId); // <-- register now
+    }
+
     document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
     document.getElementById('messageInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') sendMessage();
