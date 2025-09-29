@@ -420,24 +420,29 @@
     </div>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script>
+    <script type="module" src="/js/common.js"></script>
+    <script type="module">
+        import AuthManager from '/js/auth.js';
+        
         const socket = io();
-        const tenantId = "tenant123"; // replace with actual tenant ID in production
-        socket.emit("registerUser", tenantId);
-
-        function escapeHtml(unsafe) {
-            return unsafe
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
-        }        
-
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
-
+        
+        let adminId = null;
+        const auth = new AuthManager();
+        
+        // Utility: escape HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // Utility: add message to UI
         function addMessage(text, sender) {
             const emptyChat = chatMessages.querySelector('.empty-chat');
             if (emptyChat) emptyChat.remove();
@@ -446,12 +451,12 @@
             messageDiv.className = `message ${sender}`;
         
             if(sender === "tenant"){
-                messageDiv.style.backgroundColor = "#2563eb"; // blue
+                messageDiv.style.backgroundColor = "#2563eb";
                 messageDiv.style.color = "#ffffff";
                 messageDiv.style.marginLeft = "auto";
                 messageDiv.style.textAlign = "right";
             } else {
-                messageDiv.style.backgroundColor = "#f3f4f6"; // gray
+                messageDiv.style.backgroundColor = "#f3f4f6";
                 messageDiv.style.color = "#000000";
                 messageDiv.style.marginRight = "auto";
                 messageDiv.style.textAlign = "left";
@@ -467,42 +472,86 @@
         
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }        
-
-        async function loadHistory() {
-            const res = await fetch(`/api/messages/${tenantId}`);
-            const messages = await res.json();
-            messages.forEach(msg => {
-              addMessage(
-                msg.message,
-                msg.senderId === tenantId ? "tenant" : "landlord"
-              );
-            });
         }
         
-        document.addEventListener("DOMContentLoaded", loadHistory);
-
+        // Fetch admin ID
+        async function fetchAdminId() {
+            try {
+                const res = await fetch('/api/admin');
+                if (!res.ok) throw new Error('Failed to fetch admin');
+                const admin = await res.json();
+                adminId = admin._id;
+                localStorage.setItem('adminId', adminId);
+                console.log("Admin ID fetched:", adminId);
+            } catch (err) {
+                console.error("Error fetching admin ID:", err);
+            }
+        }
+        
+        // Load chat history
+        async function loadHistory() {
+            const tenantId = localStorage.getItem('userId'); // always fresh
+            if (!tenantId) return;
+            try {
+                const res = await fetch(`/api/messages/${tenantId}`);
+                if (!res.ok) return;
+                const messages = await res.json();
+                messages.forEach(msg => {
+                    addMessage(
+                        msg.message,
+                        msg.senderId === tenantId ? "tenant" : "landlord"
+                    );
+                });
+            } catch (err) {
+                console.error("Error loading messages:", err);
+            }
+        }
+        
+        // Socket.IO events
+        socket.on("connect", () => {
+            const tenantId = localStorage.getItem('userId'); // always fresh
+            if (tenantId) {
+                socket.emit("registerUser", tenantId);
+                console.log("Tenant registered with ID:", tenantId);
+            }
+        });
+        
         socket.on("receiveMessage", (message) => {
-            const senderType = message.senderType === "tenant" ? "tenant" : "landlord";
+            const tenantId = localStorage.getItem('userId'); // fresh
+            const senderType = message.senderId === tenantId ? "tenant" : "landlord";
             addMessage(message.message, senderType);
-        });        
-
+        });
+        
+        // Send message
         function sendMessage() {
+            const tenantId = localStorage.getItem('userId'); // fresh
             const text = messageInput.value.trim();
+        
+            if (!tenantId) {
+                alert("Please log in first!");
+                window.location.href = "/"; 
+                return;
+            }
+            if (!adminId) {
+                console.error("Admin ID not loaded yet!");
+                return;
+            }
             if (!text) return;
         
-            // Only emit, don't call addMessage
+            console.log(`Sending message from tenant: ${tenantId} to admin: ${adminId}`);
+        
             socket.emit("sendMessage", {
                 senderId: tenantId,
                 senderType: "tenant",
-                receiverId: "admin",
+                receiverId: adminId,
                 receiverType: "admin",
                 message: text
             });
         
             messageInput.value = "";
-        }                     
-
+        }
+        
+        // Event listeners
         sendBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -510,7 +559,22 @@
                 sendMessage();
             }
         });
+        
+        // Initialize
+        document.addEventListener("DOMContentLoaded", async () => {
+            const tenantId = localStorage.getItem('userId');
+            if (!tenantId) {
+                alert("Please log in first!");
+                window.location.href = "/"; // redirect to login
+                return;
+            }
+        
+            await fetchAdminId();
+            loadHistory();
+        });
     </script>
+
+        
 
 </body>
 </html>

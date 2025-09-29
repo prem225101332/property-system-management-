@@ -1,4 +1,4 @@
-const socket = io(); // connect to server
+const socket = io();
 
 // --- Helpers ---
 function escapeHtml(text) {
@@ -11,11 +11,32 @@ function formatTime(date) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    loadTenants();
+let adminId = null; // Add this variable
 
-    // Register admin as "admin" user
-    socket.emit("registerUser", "admin");
+// Fetch admin ID
+async function fetchAdminId() {
+    try {
+        const res = await fetch('/api/admin');
+        if (!res.ok) throw new Error('Failed to fetch admin');
+        const admin = await res.json();
+        adminId = admin._id;
+        localStorage.setItem('adminId', adminId); // Store admin ID
+        return adminId;
+    } catch (err) {
+        console.error("Error fetching admin ID:", err);
+        return null;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+    await loadTenants();
+    await fetchAdminId(); // Wait for admin ID
+
+    // Register admin with actual MongoDB ID
+    if (adminId) {
+        socket.emit("registerUser", adminId);
+        console.log("Admin registered with ID:", adminId);
+    }
 
     socket.on("receiveMessage", (message) => {
         renderSingleMessage(message, message.senderType === "admin" ? "sent" : "received");
@@ -59,38 +80,32 @@ function renderSingleMessage(message, direction) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// async function loadMessagesForTenant(tenantId) {
-//     const res = await fetch(`/api/messages/${tenantId}`);
-//     const messages = await res.json();
-//     renderMessages(messages); // you already have renderMessages()
-// }
-
-// document.querySelectorAll(".tenant-list-item").forEach(item => {
-//     item.addEventListener("click", () => {
-//       const tenantId = item.dataset.tenantId;
-//       loadMessagesForTenant(tenantId);
-//     });
-// });
-
-
 function sendMessage() {
     const input = document.getElementById('messageInput');
     const userSelect = document.getElementById('userSelect');
     const message = input.value.trim();
     const selectedUserId = userSelect.value;
 
+    // Use the fetched adminId instead of localStorage
     if (!message || !selectedUserId) {
         alert("Please select a tenant and type a message.");
         return;
     }
 
+    if (!adminId) {
+        alert("Admin ID not loaded. Please refresh the page.");
+        return;
+    }
+
+    console.log("Sending message from admin:", adminId, "to tenant:", selectedUserId);
+
     socket.emit("sendMessage", {
-        senderId: "admin",
+        senderId: adminId, // Use the fetched adminId
         senderType: "admin",
         receiverId: selectedUserId,
         receiverType: "tenant",
-        message
-      });      
+        message: message
+    });
 
     input.value = "";
 }

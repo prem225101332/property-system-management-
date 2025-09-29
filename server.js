@@ -52,8 +52,11 @@ app.get('/tenant-issues', (req, res) => res.sendFile(path.join(__dirname, 'publi
 
 app.get('/api/tenants', async (req, res) => {
   try {
-    // Find users where role = Tenant
-    const tenants = await User.find({ role: "Tenant" }, "name email");
+    // Only return tenants
+    const tenants = await User.find(
+      { role: "Tenant" },
+      "_id name email"
+    );
     res.json(tenants);
   } catch (err) {
     console.error("Error fetching tenants:", err);
@@ -65,35 +68,89 @@ app.get('/api/tenants', async (req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
+const connectedUsers = {}; // { userId: socketId }
 
 io.on("connection", (socket) => {
-  console.log("User connected");
+  console.log("User connected:", socket.id);
 
+  // Frontend sends their MongoDB _id after connecting
+  socket.on("registerUser", (userId) => {
+    if (!userId) {
+        console.error("User tried to register with null userId", socket.id);
+        return;
+    }
+    connectedUsers[userId] = socket.id;
+    console.log(`Registered ${userId} -> ${socket.id}`);
+  });
+
+  // Handle sending messages
   socket.on("sendMessage", async (data) => {
     try {
-      const { senderId, senderType, receiverId, receiverType, message } = data;
+        console.log("Received sendMessage event:", data);
+        
+        const { senderId, senderType, receiverId, receiverType, message } = data;
 
-      // Save to MongoDB
-      const newMessage = new Message({
-        senderId,
-        senderType,
-        receiverId,
-        receiverType,
-        message
-      });
-      await newMessage.save();
+        if (!senderId || !receiverId || !message) {
+            console.error("Missing required fields:", {
+                senderId, receiverId, message
+            });
+            return;
+        }
 
-      // Emit to the receiver (admin or tenant)
-      io.emit("receiveMessage", newMessage); 
-      // (Later you can target specific rooms instead of broadcasting to all)
+        const newMessage = new Message({
+            senderId,
+            senderType,
+            receiverId,
+            receiverType,
+            message
+        });
+        
+        await newMessage.save();
+        console.log("Message saved:", newMessage._id);
+
+        // Send to receiver
+        const receiverSocketId = connectedUsers[receiverId];
+        console.log("Receiver socket ID:", receiverSocketId, "for user:", receiverId);
+        
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("receiveMessage", newMessage);
+            console.log("Message sent to receiver");
+        }
+
+        // Echo back to sender
+        const senderSocketId = connectedUsers[senderId];
+        console.log("Sender socket ID:", senderSocketId, "for user:", senderId);
+        
+        if (senderSocketId) {
+            io.to(senderSocketId).emit("receiveMessage", newMessage);
+            console.log("Message echoed to sender");
+        }
     } catch (err) {
-      console.error("Error saving message:", err);
+        console.error("Error saving message:", err);
     }
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    console.log("User disconnected:", socket.id);
+    for (const [userId, sId] of Object.entries(connectedUsers)) {
+      if (sId === socket.id) {
+        delete connectedUsers[userId];
+        break;
+      }
+    }
   });
+});
+
+// API to get admin ID (first admin)
+app.get('/api/admin', async (req, res) => {
+  try {
+      const admin = await User.findOne({ role: 'Admin' }, "_id name email");
+      if (!admin) return res.status(404).json({ message: "Admin not found" });
+      res.json(admin);
+  } catch (err) {
+      console.error("Error fetching admin:", err);
+      res.status(500).json({ message: "Server error" });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
