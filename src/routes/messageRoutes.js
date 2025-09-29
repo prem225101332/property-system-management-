@@ -1,20 +1,36 @@
 import express from "express";
 import Message from "../models/Message.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
-// Get chat history between admin and tenant
+// Get messages between tenant and admin
 router.get("/:tenantId", async (req, res) => {
   try {
     const { tenantId } = req.params;
+
+    const admin = await User.findOne({ role: "Admin" });
+    if (!admin) return res.status(404).json({ message: "Admin not found" });
+
+    // Find conversation between this tenant and the admin
     const messages = await Message.find({
       $or: [
-        { senderId: "admin", receiverId: tenantId },
-        { senderId: tenantId, receiverId: "admin" }
-      ]
-    }).sort({ timestamp: 1 }); // oldest → newest
+        { senderId: tenantId, receiverId: admin._id.toString() },
+        { senderId: admin._id.toString(), receiverId: tenantId },
+      ],
+    }).sort({ timestamp: 1 });
 
-    res.json(messages);
+    // Attach tenant name only for tenant messages
+    const enriched = await Promise.all(messages.map(async (msg) => {
+      const plain = msg.toObject();
+      if (msg.senderType === "tenant") {
+        const tenant = await User.findById(msg.senderId).select("name");
+        plain.senderName = tenant?.name || "Tenant";
+      }
+      return plain;
+    }));
+
+    res.json(enriched);
   } catch (err) {
     console.error("Error fetching messages:", err);
     res.status(500).json({ message: "Server error" });
