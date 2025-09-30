@@ -1,235 +1,707 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Property Management System - Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>Property Management System - Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS for modal -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #6b7280;
+            --white: #ffffff;
+            --black: #000000;
+            
+            --bg-main: #ffffff;
+            --bg-sidebar: #000000;
+            --bg-card: #ffffff;
+            
+            --text-primary: #000000;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --text-white: #ffffff;
+            
+            --border-color: #e5e7eb;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            
+            --sidebar-width: 280px;
+            --header-height: 80px;
+            --border-radius: 8px;
+        }
 
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <!-- ✅ Bootstrap 5 CSS (needed for the modal) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-  <style>
-    :root { --primary:#2563eb; --primary-dark:#1d4ed8; --secondary:#6b7280; --white:#ffffff; --black:#000000;
-      --bg-main:#ffffff; --bg-sidebar:#000000; --bg-card:#ffffff; --text-primary:#000000; --text-secondary:#6b7280;
-      --text-light:#9ca3af; --text-white:#ffffff; --border-color:#e5e7eb; --shadow-sm:0 1px 3px rgba(0,0,0,0.12);
-      --shadow-md:0 4px 6px rgba(0,0,0,0.1); --shadow-lg:0 10px 15px rgba(0,0,0,0.1); --sidebar-width:280px;
-      --header-height:80px; --border-radius:8px; }
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:var(--bg-main);color:var(--text-primary);line-height:1.6;overflow-x:hidden}
-    .sidebar{position:fixed;width:var(--sidebar-width);height:100vh;background:var(--bg-sidebar);color:var(--text-white);padding:1.5rem 0;z-index:1000;transition:transform .3s ease}
-    .main-content{margin-left:var(--sidebar-width);min-height:100vh;display:flex;flex-direction:column}
-    .sidebar-header{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.1)}
-    .logo{display:flex;align-items:center;gap:.75rem;font-size:1.5rem;font-weight:700;margin-bottom:.5rem}
-    .logo i{color:var(--primary);font-size:1.8rem}
-    .subtitle{font-size:.85rem;color:var(--text-light);margin-left:2.5rem}
-    .sidebar-nav{margin-top:1.5rem}
-    .nav-section{margin-bottom:1.5rem}
-    .nav-label{font-size:.75rem;text-transform:uppercase;color:var(--text-light);padding:0 1.5rem;margin-bottom:.75rem;letter-spacing:.5px}
-    .nav-item{display:flex;align-items:center;padding:.85rem 1.5rem;color:var(--text-light);text-decoration:none;transition:all .3s ease;position:relative;cursor:pointer}
-    .nav-item:hover,.nav-item.active{background:rgba(255,255,255,.1);color:var(--text-white)}
-    .nav-item i{width:1.5rem;margin-right:.75rem;font-size:1.1rem}
-    .sign-out{margin-top:2rem;border-top:1px solid rgba(255,255,255,.1);padding-top:1rem}
-    .header{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:var(--bg-card);box-shadow:var(--shadow-sm);height:var(--header-height)}
-    .header-left h1{font-size:1.5rem;font-weight:600;margin-bottom:.25rem}
-    .header-left p{color:var(--text-secondary);font-size:.9rem}
-    .header-right{display:flex;align-items:center;gap:1rem}
-    .user-profile{width:40px;height:40px;border-radius:50%;background:var(--primary);color:var(--text-white);display:flex;align-items:center;justify-content:center;font-weight:600;cursor:pointer;text-decoration:none}
-    .chat-section{background:var(--bg-card);border-radius:var(--border-radius);padding:1.5rem;box-shadow:var(--shadow-sm);margin:2rem;flex:1;display:flex;flex-direction:column;min-height:calc(100vh - 200px)}
-    .chat-container{display:flex;flex-direction:column;height:500px;border:1px solid var(--border-color);border-radius:var(--border-radius);overflow:hidden}
-    .chat-header{padding:1rem;background:#f9fafb;border-bottom:1px solid var(--border-color);font-weight:600}
-    .chat-messages{flex:1;padding:1rem;overflow-y:auto;background:var(--bg-card)}
-    .message{margin-bottom:1rem;padding:.75rem 1rem;border-radius:var(--border-radius);max-width:80%}
-    .message.tenant{background:var(--primary);color:var(--text-white);margin-left:auto;text-align:right}
-    .message.landlord{background:#f3f4f6;color:var(--text-primary)}
-    .message-time{font-size:.75rem;opacity:.7;margin-top:.25rem}
-    .chat-input{display:flex;padding:1rem;border-top:1px solid var(--border-color);background:#f9fafb;gap:.5rem}
-    .chat-input textarea{flex:1;padding:.75rem;border:1px solid var(--border-color);border-radius:var(--border-radius);resize:vertical;min-height:50px;max-height:120px;font-family:inherit}
-    .chat-input textarea:focus{outline:none;border-color:var(--primary)}
-    .chat-input button{padding:.75rem 1.5rem;background:var(--primary);color:var(--text-white);border:none;border-radius:var(--border-radius);cursor:pointer;font-weight:500;transition:background .3s ease}
-    .chat-input button:hover{background:var(--primary-dark)}
-    .chat-input button:disabled{background:var(--secondary);cursor:not-allowed}
-    .empty-chat{text-align:center;color:var(--text-secondary);font-size:1rem;padding:2rem}
-    @media (max-width:992px){.sidebar{transform:translateX(-100%);width:280px}.sidebar.active{transform:translateX(0)}.main-content{margin-left:0}.menu-toggle{display:block;position:fixed;top:1rem;left:1rem;z-index:1100;background:var(--primary);color:var(--text-white);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-md);border:none}}
-    @media (max-width:768px){.header{flex-direction:column;align-items:flex-start;height:auto;padding:1rem}.header-right{margin-top:1rem;width:100%;justify-content:space-between}.chat-section{margin:1rem}.message{max-width:90%}}
-    .menu-toggle{display:none}
-  </style>
+        .sidebar {
+            position: fixed;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-sidebar);
+            color: var(--text-white);
+            padding: 1.5rem 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-left: 2.5rem;
+        }
+
+        .sidebar-nav {
+            margin-top: 1.5rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-light);
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+        }
+
+        .nav-item i {
+            width: 1.5rem;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .sign-out {
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+            height: var(--header-height);
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .chat-section {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 200px);
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            background: #f9fafb;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: var(--bg-card);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            max-width: 80%;
+        }
+
+        .message.tenant {
+            background: var(--primary);
+            color: var(--text-white);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.landlord {
+            background: #f3f4f6;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            background: #f9fafb;
+            gap: 0.5rem;
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            resize: vertical;
+            min-height: 50px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .chat-input button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--text-white);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: var(--primary-dark);
+        }
+
+        .chat-input button:disabled {
+            background: var(--secondary);
+            cursor: not-allowed;
+        }
+
+        .empty-chat {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            padding: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1100;
+                background: var(--primary);
+                color: var(--text-white);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: var(--shadow-md);
+                border: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                padding: 1rem;
+            }
+            
+            .header-right {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .chat-section {
+                margin: 1rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo"><i class="fas fa-building"></i><span>Property</span></div>
-      <div class="subtitle">Management System</div>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <span>Property</span>
+            </div>
+            <div class="subtitle">Management System</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-label">TENANT PORTAL</div>
+                <a href="./tenantdashboard.html" class="nav-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="./tenant-issues.html" class="nav-item">
+                    <i class="fas fa-tools"></i>
+                    <span>Issues</span>
+                </a>
+                <a href="./tenant-chat.html" class="nav-item active">
+                    <i class="fas fa-envelope"></i>
+                    <span>Chat</span>
+                </a>
+                <div class="sign-out">
+                    <a href="./index.html" class="nav-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign Out</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">
-        <div class="nav-label">TENANT PORTAL</div>
-        <a href="./tenantdashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
-        <a href="./tenant-issues.html" class="nav-item"><i class="fas fa-tools"></i><span>Issues</span></a>
-        <a href="./tenant-chat.html" class="nav-item active"><i class="fas fa-envelope"></i><span>Chat</span></a>
-        <div class="sign-out"><a href="./index.html" class="nav-item"><i class="fas fa-sign-out-alt"></i><span>Sign Out</span></a></div>
-      </div>
-    </nav>
-  </div>
 
-  <div class="main-content">
-    <header class="header">
-      <div class="header-left">
-        <h1>Chat</h1>
-        <p>Communicate with your landlord.</p>
-      </div>
-      <div class="header-right">
-        <a href="#" class="user-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
-          <span>PK</span>
-        </a>
-      </div>
-    </header>
+    <div class="main-content">
+        <header class="header">
+            <div class="header-left">
+                <h1>Chat</h1>
+                <p>Communicate with your landlord.</p>
+            </div>
+            <div class="header-right">
+                <a href="#" class="user-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <span>T</span>
+                </a>
+            </div>
+        </header>
 
-    <div class="chat-section">
-      <div class="chat-container">
-        <div class="chat-header"><i class="fas fa-comments"></i> Chat with Landlord</div>
-        <div class="chat-messages" id="chatMessages">
-          <div class="empty-chat">No messages yet. Start a conversation with your landlord.</div>
+        <div class="chat-section">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <i class="fas fa-comments"></i> Chat with Landlord
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-chat">
+                        No messages yet. Start a conversation with your landlord.
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Type your message here..."
+                        rows="2"
+                    ></textarea>
+                    <button id="sendBtn">Send</button>
+                </div>
+            </div>
         </div>
-        <div class="chat-input">
-          <textarea id="messageInput" placeholder="Type your message here..." rows="2"></textarea>
-          <button id="sendBtn">Send</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- ✅ Profile Modal (Bootstrap) -->
-  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Profile</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Name:</strong> <span id="pmName">—</span></p>
+                    <p><strong>Email:</strong> <span id="pmEmail">—</span></p>
+                    <p><strong>Role:</strong> <span id="pmRole">—</span></p>
+                    <p><strong>Phone:</strong> <span id="pmPhone">—</span></p>
+                    <div id="pmTenantBlock" class="mt-3 d-none">
+                        <hr>
+                        <p><strong>Property:</strong> <span id="pmProperty">—</span></p>
+                        <p><strong>Rent:</strong> <span id="pmRent">—</span></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="btnLogout">Logout</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <p><strong>Name:</strong> <span id="pmName">—</span></p>
-          <p><strong>Email:</strong> <span id="pmEmail">—</span></p>
-          <p><strong>Role:</strong> <span id="pmRole">—</span></p>
-          <p><strong>Phone:</strong> <span id="pmPhone">—</span></p>
-          <div id="pmTenantBlock" class="mt-3 d-none">
-            <hr>
-            <p><strong>Property:</strong> <span id="pmProperty">—</span></p>
-            <p><strong>Rent:</strong> <span id="pmRent">—</span></p>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" id="btnLogout">Logout</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- libs -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script type="module" src="/js/common.js"></script>
-
-  <!-- Inline: hydrate the profile modal using your APIs (prefers /api/addtenants) -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const modalEl = document.getElementById('profileModal');
-      modalEl?.addEventListener('shown.bs.modal', hydrateProfileModal);
-
-      document.getElementById('btnLogout')?.addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.href = '/index.html';
-      });
-    });
-
-    function getToken(){ return localStorage.getItem('token'); }
-    function authHeaders(){ const t=getToken(); return t?{ Authorization:`Bearer ${t}` }:{}; }
-    async function getJSON(url,{allow401=false}={}){
-      const res = await fetch(url,{ headers:{'Content-Type':'application/json',...authHeaders()}, credentials:'include' });
-      if(!res.ok){ if(allow401 && res.status===401) return null; const text=await res.text().catch(()=>res.statusText); throw new Error(text); }
-      const body = await res.json();
-      return body?.data ?? body; // supports {ok:true,data:{...}} or plain object
-    }
-    function setText(id, v){ const el=document.getElementById(id); if(el) el.textContent = v ?? '—'; }
-
-    // 🔹 Prefer assignment data from /api/addtenants
-    async function fetchTenantAssignmentByEmail(email){
-      try{
-        const list = await getJSON('/api/addtenants');
-        if (!Array.isArray(list)) return null;
-        return list.find(x => (x?.email || '').toLowerCase() === String(email).toLowerCase()) || null;
-      }catch(e){
-        console.debug('[profile modal] addtenants fetch fail:', e?.message || e);
-        return null;
-      }
-    }
-
-    async function hydrateProfileModal(){
-      try{
-        // who am I
-        let user = await getJSON('/api/auth/me', { allow401:true });
-        if(!user){
-          const t = getToken();
-          if(t && t.split('.').length>=2){
-            const p = JSON.parse(atob(t.split('.')[1]));
-            if(p?.email) user = { name:p.name, email:p.email, role:p.role, phone:p.phone ?? null };
-          }
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    
+    <!-- Bootstrap 5 JS for modal -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Profile Modal Logic -->
+    <script>
+        function getToken(){ return localStorage.getItem('token'); }
+        function authHeaders(){ const t=getToken(); return t?{ Authorization:`Bearer ${t}` }:{}; }
+        
+        async function getJSON(url,{allow401=false}={}){
+            const res = await fetch(url,{ headers:{'Content-Type':'application/json',...authHeaders()}, credentials:'include' });
+            if(!res.ok){ 
+                if(allow401 && res.status===401) return null; 
+                const text=await res.text().catch(()=>res.statusText); 
+                throw new Error(text); 
+            }
+            const body = await res.json();
+            return body?.data ?? body;
         }
-        if(!user || !user.email) throw new Error('No identity');
-
-        setText('pmName',  user.name || 'User');
-        setText('pmEmail', user.email);
-        setText('pmRole',  user.role || '—');
-
-        // assignment first
-        const assign = await fetchTenantAssignmentByEmail(user.email);
-
-        // phone: assignment -> user -> customers/me/record
-        let phone = assign?.phone ?? user.phone ?? null;
-        if (!phone) {
-          try { const me = await getJSON('/api/customers/me/record'); phone = me?.phone ?? phone; } catch {}
+        
+        function setText(id, v){ 
+            const el=document.getElementById(id); 
+            if(el) el.textContent = v ?? '—'; 
         }
-        setText('pmPhone', phone);
 
-        const tenantBlock = document.getElementById('pmTenantBlock');
-        if (user.role === 'Tenant') {
-          tenantBlock?.classList.remove('d-none');
+        async function fetchTenantAssignmentByEmail(email){
+            try{
+                const list = await getJSON('/api/addtenants');
+                if (!Array.isArray(list)) return null;
+                return list.find(x => (x?.email || '').toLowerCase() === String(email).toLowerCase()) || null;
+            }catch(e){
+                console.debug('[profile modal] addtenants fetch fail:', e?.message || e);
+                return null;
+            }
+        }
 
-          // property from assignment
-          const property =
-            assign?.propertyName ??
-            assign?.property ??
-            assign?.assignedProperty ??
-            assign?.unit ?? null;
+        async function hydrateProfileModal(){
+            try{
+                let user = await getJSON('/api/auth/me', { allow401:true });
+                if(!user){
+                    const t = getToken();
+                    if(t && t.split('.').length>=2){
+                        const p = JSON.parse(atob(t.split('.')[1]));
+                        if(p?.email) user = { name:p.name, email:p.email, role:p.role, phone:p.phone ?? null };
+                    }
+                }
+                if(!user || !user.email) throw new Error('No identity');
 
-          // rent & paid: assignment then fallback to customers record
-          let dueAmount = (typeof assign?.rent === 'number') ? assign.rent : null;
-          let paid = (typeof assign?.paid === 'boolean') ? assign.paid : null;
+                setText('pmName',  user.name || 'User');
+                setText('pmEmail', user.email);
+                setText('pmRole',  user.role || '—');
 
-          if (dueAmount == null || paid == null) {
+                const assign = await fetchTenantAssignmentByEmail(user.email);
+
+                let phone = assign?.phone ?? user.phone ?? null;
+                if (!phone) {
+                    try { const me = await getJSON('/api/customers/me/record'); phone = me?.phone ?? phone; } catch {}
+                }
+                setText('pmPhone', phone);
+
+                const tenantBlock = document.getElementById('pmTenantBlock');
+                if (user.role === 'Tenant') {
+                    tenantBlock?.classList.remove('d-none');
+
+                    const property =
+                        assign?.propertyName ??
+                        assign?.property ??
+                        assign?.assignedProperty ??
+                        assign?.unit ?? null;
+
+                    let dueAmount = (typeof assign?.rent === 'number') ? assign.rent : null;
+                    let paid = (typeof assign?.paid === 'boolean') ? assign.paid : null;
+
+                    if (dueAmount == null || paid == null) {
+                        try {
+                            const c = await getJSON('/api/customers/me/record');
+                            if (dueAmount == null && typeof c?.dueAmount === 'number') dueAmount = c.dueAmount;
+                            if (paid == null && typeof c?.paid === 'boolean')         paid = c.paid;
+                        } catch {}
+                    }
+
+                    setText('pmProperty', property);
+                    const rentText =
+                        (dueAmount != null ? `A$${Number(dueAmount).toFixed(2)}` : '—') +
+                        (paid != null ? ` • Paid: ${paid ? 'Yes' : 'No'}` : '');
+                    setText('pmRent', rentText);
+                } else {
+                    tenantBlock?.classList.add('d-none');
+                }
+            }catch(e){
+                console.error('[profile modal] failed:', e?.message||e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('profileModal');
+            modalEl?.addEventListener('shown.bs.modal', hydrateProfileModal);
+
+            document.getElementById('btnLogout')?.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('adminId');
+                window.location.href = '/index.html';
+            });
+        });
+    </script>
+    
+    <!-- Chat Logic -->
+    <script type="module">
+        import AuthManager from '/js/auth.js';
+        
+        const socket = io();
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        let adminId = null;
+        const auth = new AuthManager();
+        
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        function addMessage(text, sender) {
+            const emptyChat = chatMessages.querySelector('.empty-chat');
+            if (emptyChat) emptyChat.remove();
+        
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+        
+            if(sender === "tenant"){
+                messageDiv.style.backgroundColor = "#2563eb";
+                messageDiv.style.color = "#ffffff";
+                messageDiv.style.marginLeft = "auto";
+                messageDiv.style.textAlign = "right";
+            } else {
+                messageDiv.style.backgroundColor = "#f3f4f6";
+                messageDiv.style.color = "#000000";
+                messageDiv.style.marginRight = "auto";
+                messageDiv.style.textAlign = "left";
+            }
+        
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+            messageDiv.innerHTML = `
+                <div>${escapeHtml(text)}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+        
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        async function fetchAdminId() {
             try {
-              const c = await getJSON('/api/customers/me/record');
-              if (dueAmount == null && typeof c?.dueAmount === 'number') dueAmount = c.dueAmount;
-              if (paid == null && typeof c?.paid === 'boolean')         paid = c.paid;
-            } catch {}
-          }
-
-          setText('pmProperty', property);
-          const rentText =
-            (dueAmount != null ? `A$${Number(dueAmount).toFixed(2)}` : '—') +
-            (paid != null ? ` • Paid: ${paid ? 'Yes' : 'No'}` : '');
-          setText('pmRent', rentText);
-        } else {
-          tenantBlock?.classList.add('d-none');
+                const res = await fetch('/api/admin');
+                if (!res.ok) throw new Error('Failed to fetch admin');
+                const admin = await res.json();
+                adminId = admin._id;
+                localStorage.setItem('adminId', adminId);
+                console.log("Admin ID fetched:", adminId);
+            } catch (err) {
+                console.error("Error fetching admin ID:", err);
+            }
         }
-      }catch(e){
-        console.error('[profile modal] failed:', e?.message||e);
-      }
-    }
-  </script>
-
-  <!-- ✅ Bootstrap 5 JS (needed for modal behavior) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        
+        async function loadHistory() {
+            const tenantId = localStorage.getItem('userId');
+            if (!tenantId) return;
+            try {
+                const res = await fetch(`/api/messages/${tenantId}`);
+                if (!res.ok) return;
+                const messages = await res.json();
+                messages.forEach(msg => {
+                    addMessage(
+                        msg.message,
+                        msg.senderId === tenantId ? "tenant" : "landlord"
+                    );
+                });
+            } catch (err) {
+                console.error("Error loading messages:", err);
+            }
+        }
+        
+        socket.on("connect", () => {
+            const tenantId = localStorage.getItem('userId');
+            if (tenantId) {
+                socket.emit("registerUser", tenantId);
+                console.log("Tenant registered with ID:", tenantId);
+            }
+        });
+        
+        socket.on("receiveMessage", (message) => {
+            const tenantId = localStorage.getItem('userId');
+            const senderType = message.senderId === tenantId ? "tenant" : "landlord";
+            addMessage(message.message, senderType);
+        });
+        
+        function sendMessage() {
+            const tenantId = localStorage.getItem('userId');
+            const text = messageInput.value.trim();
+        
+            if (!tenantId) {
+                alert("Please log in first!");
+                window.location.href = "/"; 
+                return;
+            }
+            if (!adminId) {
+                console.error("Admin ID not loaded yet!");
+                return;
+            }
+            if (!text) return;
+        
+            console.log(`Sending message from tenant: ${tenantId} to admin: ${adminId}`);
+        
+            socket.emit("sendMessage", {
+                senderId: tenantId,
+                senderType: "tenant",
+                receiverId: adminId,
+                receiverType: "admin",
+                message: text
+            });
+        
+            messageInput.value = "";
+        }
+        
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        document.addEventListener("DOMContentLoaded", async () => {
+            const tenantId = localStorage.getItem('userId');
+            if (!tenantId) {
+                alert("Please log in first!");
+                window.location.href = "/";
+                return;
+            }
+        
+            await fetchAdminId();
+            loadHistory();
+        });
+    </script>
 </body>
 </html>
