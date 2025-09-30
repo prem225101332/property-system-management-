@@ -5,6 +5,13 @@
     <title>Property Management System - Issues</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+      <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- ✅ Bootstrap 5 CSS (needed for the modal) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         :root {
             --primary: #2563eb;
@@ -376,11 +383,11 @@
                 <h1>Issues</h1>
                 <p>Report and manage maintenance issues.</p>
             </div>
-            <div class="header-right">
-                <div class="user-profile">
-                    <span>T</span>
-                </div>
-            </div>
+ <div class="header-right">
+        <a href="#" class="user-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
+          <span>PK</span>
+        </a>
+      </div>
         </header>
 
         <div class="dashboard-content">
@@ -430,6 +437,133 @@
         </div>
     </div>
 
+     <!-- ✅ Profile Modal (Bootstrap) -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Name:</strong> <span id="pmName">—</span></p>
+          <p><strong>Email:</strong> <span id="pmEmail">—</span></p>
+          <p><strong>Role:</strong> <span id="pmRole">—</span></p>
+          <p><strong>Phone:</strong> <span id="pmPhone">—</span></p>
+          <div id="pmTenantBlock" class="mt-3 d-none">
+            <hr>
+            <p><strong>Property:</strong> <span id="pmProperty">—</span></p>
+            <p><strong>Rent:</strong> <span id="pmRent">—</span></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" id="btnLogout">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    
     <script src="./js/tenant-issues.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modalEl = document.getElementById('profileModal');
+      modalEl?.addEventListener('shown.bs.modal', hydrateProfileModal);
+
+      document.getElementById('btnLogout')?.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        window.location.href = '/index.html';
+      });
+    });
+
+    function getToken(){ return localStorage.getItem('token'); }
+    function authHeaders(){ const t=getToken(); return t?{ Authorization:`Bearer ${t}` }:{}; }
+    async function getJSON(url,{allow401=false}={}){
+      const res = await fetch(url,{ headers:{'Content-Type':'application/json',...authHeaders()}, credentials:'include' });
+      if(!res.ok){ if(allow401 && res.status===401) return null; const text=await res.text().catch(()=>res.statusText); throw new Error(text); }
+      const body = await res.json();
+      return body?.data ?? body; // supports {ok:true,data:{...}} or plain object
+    }
+    function setText(id, v){ const el=document.getElementById(id); if(el) el.textContent = v ?? '—'; }
+
+    // 🔹 Prefer assignment data from /api/addtenants
+    async function fetchTenantAssignmentByEmail(email){
+      try{
+        const list = await getJSON('/api/addtenants');
+        if (!Array.isArray(list)) return null;
+        return list.find(x => (x?.email || '').toLowerCase() === String(email).toLowerCase()) || null;
+      }catch(e){
+        console.debug('[profile modal] addtenants fetch fail:', e?.message || e);
+        return null;
+      }
+    }
+
+    async function hydrateProfileModal(){
+      try{
+        // who am I
+        let user = await getJSON('/api/auth/me', { allow401:true });
+        if(!user){
+          const t = getToken();
+          if(t && t.split('.').length>=2){
+            const p = JSON.parse(atob(t.split('.')[1]));
+            if(p?.email) user = { name:p.name, email:p.email, role:p.role, phone:p.phone ?? null };
+          }
+        }
+        if(!user || !user.email) throw new Error('No identity');
+
+        setText('pmName',  user.name || 'User');
+        setText('pmEmail', user.email);
+        setText('pmRole',  user.role || '—');
+
+        // assignment first
+        const assign = await fetchTenantAssignmentByEmail(user.email);
+
+        // phone: assignment -> user -> customers/me/record
+        let phone = assign?.phone ?? user.phone ?? null;
+        if (!phone) {
+          try { const me = await getJSON('/api/customers/me/record'); phone = me?.phone ?? phone; } catch {}
+        }
+        setText('pmPhone', phone);
+
+        const tenantBlock = document.getElementById('pmTenantBlock');
+        if (user.role === 'Tenant') {
+          tenantBlock?.classList.remove('d-none');
+
+          // property from assignment
+          const property =
+            assign?.propertyName ??
+            assign?.property ??
+            assign?.assignedProperty ??
+            assign?.unit ?? null;
+
+          // rent & paid: assignment then fallback to customers record
+          let dueAmount = (typeof assign?.rent === 'number') ? assign.rent : null;
+          let paid = (typeof assign?.paid === 'boolean') ? assign.paid : null;
+
+          if (dueAmount == null || paid == null) {
+            try {
+              const c = await getJSON('/api/customers/me/record');
+              if (dueAmount == null && typeof c?.dueAmount === 'number') dueAmount = c.dueAmount;
+              if (paid == null && typeof c?.paid === 'boolean')         paid = c.paid;
+            } catch {}
+          }
+
+          setText('pmProperty', property);
+          const rentText =
+            (dueAmount != null ? `A$${Number(dueAmount).toFixed(2)}` : '—') +
+            (paid != null ? ` • Paid: ${paid ? 'Yes' : 'No'}` : '');
+          setText('pmRent', rentText);
+        } else {
+          tenantBlock?.classList.add('d-none');
+        }
+      }catch(e){
+        console.error('[profile modal] failed:', e?.message||e);
+      }
+    }
+  </script>
+
+  <!-- ✅ Bootstrap 5 JS (needed for modal behavior) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
