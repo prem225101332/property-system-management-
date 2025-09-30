@@ -18,6 +18,9 @@ import messageRoutes from './src/routes/messageRoutes.js';
 import Message from './src/models/Message.js';
 import AddTenant from './src/models/AddTenant.js';
 import User from './src/models/User.js';
+import authMeRoutes from './src/routes/auth.me.js';
+
+
 
 dotenv.config();
 
@@ -40,6 +43,8 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api/issues', issueRoutes);
 app.use('/api', addTenantRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api', authMeRoutes);
+
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
