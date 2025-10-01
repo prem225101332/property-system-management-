@@ -157,6 +157,29 @@ DELETE /api/issues/:id - Delete issue
 
 ---
 
+
+## Static Pages
+
+Express serves HTML at:
+- `/`
+- `/admin`
+- `/customer`
+- `/properties`
+- `/tenants`
+- `/chat`
+- `/addtenant`
+- `/tenant-issues`
+- `/api/tenants`
+- `/api/admin`
+
+## Postman Workflow (quick)
+
+1. `POST /api/auth/register` (Admin) → `POST /api/auth/login` → copy `token`
+2. Properties CRUD at `/api/properties` (set Bearer token)
+3. Upload images: `POST /api/properties/:id/images` (form-data key `images`)
+4. Tenants CRUD at `/api/addtenants`
+5. Issues CRUD at `/api/issues`
+
 ## Scripts
 
 From `package.json`:
@@ -179,6 +202,16 @@ There is no `"start"` script; run `node server.js` to launch Express.
 - **Do not commit `.env`.**
 
 ---
+
+### Mounts in `server.js`
+
+- `app.use('/api/auth', authRoutes)`
+- `app.use('/api/customers', customerRoutes)`
+- `app.use('/api/properties', propertyRoutes)`
+- `app.use('/api/issues', issueRoutes)`
+- `app.use('/api', addTenantRoutes)`
+- `app.use('/api/messages', messageRoutes)`
+- `app.use('/api', authMeRoutes)`
 
 ## Team
 
