@@ -12,7 +12,6 @@ function escapeHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
 }
 
-// Map schema → pretty for select, and vice-versa for sending back
 const schemaToPretty = { OPEN:'Pending', IN_PROGRESS:'In Process', RESOLVED:'Completed' };
 const prettyToApi = { 'Pending':'PENDING', 'In Process':'IN PROCESS', 'Completed':'COMPLETED' };
 
@@ -74,7 +73,6 @@ function renderRows(list) {
     const btn = tr.querySelector('button');
     btn.addEventListener('click', async () => {
       await updateStatus(it._id, select.value, btn);
-      // Optional: refresh row to reflect normalized server status
       const fresh = await fetchIssues();
       renderRows(fresh);
     });

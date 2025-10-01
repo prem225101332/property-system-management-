@@ -1,6 +1,5 @@
 // common.js
 
-// Token management
 export function saveToken(token) {
   localStorage.setItem('token', token);
 }
@@ -13,7 +12,6 @@ export function clearToken() {
   localStorage.removeItem('token');
 }
 
-// API helper
 export async function api(path, method = 'GET', body) {
   const headers = { 'Content-Type': 'application/json' };
   const token = getToken();
@@ -39,7 +37,6 @@ export async function api(path, method = 'GET', body) {
   return data;
 }
 
-// Logout
 export function logout() {
   clearToken();
   window.location.href = '/';

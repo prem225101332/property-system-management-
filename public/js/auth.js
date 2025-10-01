@@ -1,4 +1,3 @@
-// Authentication and User Management
 class AuthManager {
   constructor() {
     this.currentUser = null;
@@ -57,5 +56,5 @@ class AuthManager {
   }
 }
 
-// **Export default for ES module import**
+
 export default AuthManager;

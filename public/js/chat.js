@@ -13,7 +13,7 @@ function formatTime(date) {
 let adminId = null;
 let selectedTenantId = null;
 
-// Fetch admin ID
+
 async function fetchAdminId() {
     try {
         const res = await fetch('/api/admin');
@@ -27,7 +27,7 @@ async function fetchAdminId() {
     }
 }
 
-// Load tenants into dropdown
+
 async function loadTenants() {
     try {
         const res = await fetch("/api/tenants");
@@ -40,7 +40,7 @@ async function loadTenants() {
             userSelect.appendChild(option);
         });
 
-        // Listen for tenant selection to load chat history
+        
         userSelect.addEventListener("change", () => {
             selectedTenantId = userSelect.value;
             loadHistory(selectedTenantId);
@@ -51,7 +51,7 @@ async function loadTenants() {
     }
 }
 
-// Render messages
+
 function renderSingleMessage(message, direction) {
     const messagesContainer = document.getElementById('chatMessages');
     const now = new Date(message.timestamp || Date.now());
@@ -59,7 +59,7 @@ function renderSingleMessage(message, direction) {
     const div = document.createElement("div");
     div.className = `message ${direction}`;
 
-    // Only show tenant name for tenant messages
+  
     const senderLabel = message.senderType === "tenant" ? `<strong>${escapeHtml(message.senderName || "Tenant")}:</strong>` : "";
 
     div.innerHTML = `
@@ -72,7 +72,7 @@ function renderSingleMessage(message, direction) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Send message
+
 function sendMessage() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
@@ -98,10 +98,10 @@ function sendMessage() {
     input.value = "";
 }
 
-// Load chat history
+
 async function loadHistory(tenantId) {
     const messagesContainer = document.getElementById('chatMessages');
-    messagesContainer.innerHTML = ""; // clear old messages
+    messagesContainer.innerHTML = ""; 
 
     if (!tenantId) return;
 
@@ -118,7 +118,7 @@ async function loadHistory(tenantId) {
     }
 }
 
-// Socket events
+
 socket.on("connect", () => {
     if (adminId) {
         socket.emit("registerUser", adminId);
@@ -135,10 +135,10 @@ socket.on("receiveMessage", (message) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadTenants();
-    adminId = await fetchAdminId(); // ensure adminId is set
+    adminId = await fetchAdminId(); 
 
     if (adminId) {
-        socket.emit("registerUser", adminId); // <-- register now
+        socket.emit("registerUser", adminId); 
     }
 
     document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
