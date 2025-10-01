@@ -129,34 +129,76 @@ npm run preview      # preview built assets
 
 ## API Overview
 
-API Endpoints
+## API Documentation
 
-Authentication
-
-POST /api/auth/login - User login
-POST /api/auth/register - User registration
-POST /api/auth/logout - User logout
-Properties
-
-GET /api/properties - Get all properties
-POST /api/properties - Create new property
-PUT /api/properties/:id - Update property
-DELETE /api/properties/:id - Delete property
-Tenants
-
-GET /api/tenants - Get all tenants
-POST /api/tenants - Add new tenant
-PUT /api/tenants/:id - Update tenant
-DELETE /api/tenants/:id - Remove tenant
-Issues
-
-GET /api/issues - Get all issues
-POST /api/issues - Create new issue
-PUT /api/issues/:id - Update issue status
-DELETE /api/issues/:id - Delete issue
-
+### Authentication
+| Method | Endpoint             | Description         |
+|--------|----------------------|---------------------|
+| POST   | `/api/auth/login`    | User login          |
+| POST   | `/api/auth/register` | User registration   |
+| POST   | `/api/auth/logout`   | User logout         |
 
 ---
+
+### Properties
+| Method | Endpoint                  | Description             |
+|--------|---------------------------|-------------------------|
+| GET    | `/api/properties`         | Get all properties      |
+| POST   | `/api/properties`         | Create new property     |
+| PUT    | `/api/properties/:id`     | Update property         |
+| DELETE | `/api/properties/:id`     | Delete property         |
+
+---
+
+### Tenants
+| Method | Endpoint               | Description         |
+|--------|------------------------|---------------------|
+| GET    | `/api/tenants`         | Get all tenants     |
+| POST   | `/api/tenants`         | Add new tenant      |
+| PUT    | `/api/tenants/:id`     | Update tenant       |
+| DELETE | `/api/tenants/:id`     | Remove tenant       |
+
+---
+
+### Issues
+| Method | Endpoint             | Description              |
+|--------|----------------------|--------------------------|
+| GET    | `/api/issues`        | Get all issues           |
+| POST   | `/api/issues`        | Create new issue         |
+| PUT    | `/api/issues/:id`    | Update issue status      |
+| DELETE | `/api/issues/:id`    | Delete issue             |
+
+---
+
+### Messages (Chat)
+| Method | Endpoint            | Description          |
+|--------|---------------------|----------------------|
+| GET    | `/api/messages`     | Fetch chat history   |
+| POST   | `/api/messages`     | Send new message     |
+
+---
+
+## Controllers
+- **addtenantController.js** – handles tenant creation and updates  
+- **issueController.js** – CRUD operations for tenant issues  
+- **propertyController.js** – CRUD operations for properties  
+
+---
+
+## Middleware
+- **auth.js** – JWT verification middleware  
+  - Rejects missing/invalid tokens  
+  - Attaches decoded user to `req.user`  
+  - Can be extended for role-based access  
+
+---
+
+## Utils
+- **auth.js** – helper functions to generate and verify JWT tokens  
+  - Password hashing and verification with bcrypt  
+  - Token generation & decoding  
+
+
 
 
 ## Static Pages
