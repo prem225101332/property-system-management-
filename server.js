@@ -156,7 +156,7 @@ app.get('/api/admin', async (req, res) => {
   } catch (err) {
       console.error("Error fetching admin:", err);
       res.status(500).json({ message: "Server error" });
-  }
+  },8j
 });
 
 const PORT = process.env.PORT || 3000;
