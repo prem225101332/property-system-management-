@@ -73,12 +73,11 @@ app.get('/api/tenants', async (req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-const connectedUsers = {}; // { userId: socketId }
+const connectedUsers = {};
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // Frontend sends their MongoDB _id after connecting
   socket.on("registerUser", (userId) => {
     if (!userId) {
         console.error("User tried to register with null userId", socket.id);
@@ -88,7 +87,6 @@ io.on("connection", (socket) => {
     console.log(`Registered ${userId} -> ${socket.id}`);
   });
 
-  // Handle sending messages
   socket.on("sendMessage", async (data) => {
     try {
         console.log("Received sendMessage event:", data);
@@ -150,7 +148,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// API to get admin ID (first admin)
 app.get('/api/admin', async (req, res) => {
   try {
       const admin = await User.findOne({ role: 'Admin' }, "_id name email");

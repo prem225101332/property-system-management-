@@ -8,21 +8,17 @@ const formMsg = document.getElementById("formMsg")
 const formTitle = document.getElementById("formTitle")
 const cancelEdit = document.getElementById("cancelEdit")
 
-// Dashboard navigation
 const navItems = document.querySelectorAll(".nav-item")
 const dashboardContent = document.querySelector(".dashboard-content")
 const customerManagement = document.querySelector(".customer-management")
 
-// Protect page
 if (!localStorage.getItem("token")) window.location.href = "/"
 
-// Initialize dashboard
 document.addEventListener("DOMContentLoaded", () => {
   initializeCharts()
   loadCustomers()
   setupNavigation()
 
-  // Event listeners
   document.getElementById("logoutBtn").addEventListener("click", logout)
   showDeleted?.addEventListener("change", loadCustomers)
   form?.addEventListener("submit", handleFormSubmit)
@@ -30,19 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
   tableBody?.addEventListener("click", handleTableActions)
 })
 
-// Navigation setup
 function setupNavigation() {
   navItems.forEach((item) => {
     item.addEventListener("click", (e) => {
       e.preventDefault()
       const target = item.getAttribute("href")
 
-      // Remove active class from all items
       navItems.forEach((nav) => nav.classList.remove("active"))
-      // Add active class to clicked item
       item.classList.add("active")
 
-      // Show/hide content based on navigation
       if (target === "#dashboard") {
         dashboardContent.style.display = "block"
         customerManagement.style.display = "none"
@@ -54,9 +46,7 @@ function setupNavigation() {
   })
 }
 
-// Initialize charts
 function initializeCharts() {
-  // Revenue Chart
   const revenueCtx = document.getElementById("revenueChart")
   if (revenueCtx) {
     new Chart(revenueCtx, {
@@ -101,7 +91,6 @@ function initializeCharts() {
     })
   }
 
-  // Status Chart
   const statusCtx = document.getElementById("statusChart")
   if (statusCtx) {
     new Chart(statusCtx, {
@@ -130,7 +119,6 @@ function initializeCharts() {
   }
 }
 
-// Form handling
 function resetForm() {
   if (form) {
     form.reset()
@@ -170,7 +158,6 @@ async function handleFormSubmit(e) {
   }
 }
 
-// Load customers
 async function loadCustomers() {
   if (!tableBody || !tableMsg) return
 
@@ -223,7 +210,6 @@ async function loadCustomers() {
   }
 }
 
-// Handle table actions
 async function handleTableActions(e) {
   const btn = e.target.closest("button")
   if (!btn) return
@@ -244,7 +230,6 @@ async function handleTableActions(e) {
       formTitle.textContent = "Edit Customer"
       cancelEdit.style.display = "inline-flex"
 
-      // Switch to customer management view
       dashboardContent.style.display = "none"
       customerManagement.style.display = "block"
       navItems.forEach((nav) => nav.classList.remove("active"))
@@ -280,13 +265,11 @@ async function handleTableActions(e) {
   }
 }
 
-// Quick action functions
 function showAddPropertyModal() {
   alert("Add Property functionality - Coming soon!")
 }
 
 function showAddTenantModal() {
-  // Switch to customer management and show form
   dashboardContent.style.display = "none"
   customerManagement.style.display = "block"
   navItems.forEach((nav) => nav.classList.remove("active"))
@@ -303,7 +286,6 @@ function broadcastMessage() {
   alert("Broadcast Message functionality - Coming soon!")
 }
 
-// Logout function
 function logout() {
   if (confirm("Are you sure you want to logout?")) {
     localStorage.removeItem("token")
@@ -311,7 +293,6 @@ function logout() {
   }
 }
 
-// API helper function (assuming it exists in common.js)
 async function api(path, method = "GET", body = null) {
   const token = localStorage.getItem("token")
   const options = {
