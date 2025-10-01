@@ -114,10 +114,9 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   try {
     const result = await apiCall("/api/auth/login", "POST", { email, password });
 
-    // Save token and user info
     localStorage.setItem("token", result.token);
-    localStorage.setItem("userId", result.user._id);   // ✅ FIX
-    localStorage.setItem("role", result.user.role);    // optional
+    localStorage.setItem("userId", result.user._id);  
+    localStorage.setItem("role", result.user.role);   
     localStorage.setItem("currentUser", JSON.stringify(result.user));
 
     const redirectUrl =

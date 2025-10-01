@@ -1,7 +1,3 @@
-// Uses your GET /api/properties which returns an ARRAY.
-// Fields per your schema: title, address.line1/city/state/postcode, rent, bedrooms, bathrooms,
-// parking (boolean), images [String], status ('AVAILABLE'|'OCCUPIED'), description.
-
 (function () {
   const API_BASE = '/api/properties';
   const GRID = document.getElementById('properties');
@@ -10,7 +6,6 @@
   const STATUS = document.getElementById('statusFilter');
   const LOGOUT = document.getElementById('logoutBtn');
 
-  // If you store JWT locally and protect the API, wire it here.
   const tokenKey = 'authToken';
   const token = localStorage.getItem(tokenKey);
 
@@ -28,12 +23,10 @@
       const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': `Bearer ${token}` // uncomment if your API requires auth
         }
       });
       if (!res.ok) throw new Error('Failed to load properties');
-      const items = await res.json(); // ARRAY per your controller
-
+      const items = await res.json();
       render(items);
     } catch (err) {
       console.error(err);
@@ -87,7 +80,6 @@
     ));
   }
 
-  // Load AVAILABLE by default
   STATUS.value = 'AVAILABLE';
   fetchAndRender();
 

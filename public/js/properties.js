@@ -119,7 +119,7 @@ function escapeHtml(s) {
     .replaceAll("'", '&#39;');
 }
 
-/** ---------------- Modal open/close ---------------- */
+//Modal open/close
 function openPropertyModal() {
   document.getElementById('propertyModalTitle').textContent = 'Add New Property';
   document.getElementById('propertyForm').reset();
@@ -140,7 +140,7 @@ function closeModals() {
   document.getElementById('propertyModal').classList.remove('active');
 }
 
-/** ---------------- Edit / Create ---------------- */
+//Edit / Create
 async function editProperty(propertyId) {
   try {
     const p = await api(`/api/properties/${propertyId}`);
@@ -152,7 +152,6 @@ async function editProperty(propertyId) {
     document.getElementById('propertyPrice').value = p.rent ?? '';
     document.getElementById('propertyStatus').value = schemaToUiStatus(p.status || 'AVAILABLE');
 
-    // clear new-file input (we only append new files on save)
     const fileInput = document.getElementById('propertyImages');
     if (fileInput) fileInput.value = '';
 
@@ -196,7 +195,6 @@ async function handlePropertySubmit(e) {
   if (!line1) return alert('Address is required.');
   if (!(rent >= 0)) return alert('Rent must be a number.');
 
-  // Build JSON payload for property core fields
   const payload = {
     title,
     address: { line1, city: '', state: '', postcode: '' },
@@ -213,7 +211,6 @@ async function handlePropertySubmit(e) {
   try {
     let id = propertyId;
 
-    // Step 1: create or update
     if (id) {
       await api(`/api/properties/${id}`, 'PUT', payload);
     } else {
@@ -221,7 +218,6 @@ async function handlePropertySubmit(e) {
       id = created._id;
     }
 
-    // Step 2: upload files if any
     if (files && files.length) {
       await uploadImages(id, files);
     }
@@ -234,7 +230,7 @@ async function handlePropertySubmit(e) {
   }
 }
 
-/** ---------------- Delete ---------------- */
+//Delete
 async function deleteProperty(propertyId) {
   if (!confirm('Are you sure you want to delete this property?')) return;
   try {

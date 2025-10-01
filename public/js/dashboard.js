@@ -24,7 +24,6 @@ function hideAlert() {
 }
 
 function statusBadgeClass(status) {
-  // Maps property status to the CSS class we defined in <style>
   if (!status) return 'status-PENDING';
   return `status-${String(status).toUpperCase()}`;
 }

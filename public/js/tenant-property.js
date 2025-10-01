@@ -1,8 +1,8 @@
 (function () {
-  const tokenKey = 'authToken'; // if you use JWT
+  const tokenKey = 'authToken';
   const token = localStorage.getItem(tokenKey);
 
-  const pid = location.pathname.split('/').pop(); // /tenant/property/:id
+  const pid = location.pathname.split('/').pop(); 
   const $title = document.getElementById('title');
   const $addr = document.getElementById('addr');
   const $stats = document.getElementById('stats');
@@ -14,7 +14,6 @@
   const $msg = document.getElementById('msg');
   const $send = document.getElementById('sendBtn');
 
-  // ---- Property details ----
   async function loadProperty() {
     const res = await fetch(`/api/properties/${pid}`, {
       headers: { 'Content-Type': 'application/json' }
@@ -53,7 +52,6 @@
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${token}`
       }
     });
     if (!res.ok) return;
@@ -84,13 +82,12 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ text })
     });
     if (res.ok) {
       $msg.value = '';
-      lastSeenISO = null; // reload all to include our own message ordered by server time
+      lastSeenISO = null; 
       await loadChat();
     }
   }
@@ -100,8 +97,7 @@
     if (e.key === 'Enter') sendMessage();
   });
 
-  // init
   loadProperty();
   loadChat();
-  setInterval(loadChat, 4000); // simple polling
+  setInterval(loadChat, 4000);
 })();
