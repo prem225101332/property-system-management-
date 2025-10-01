@@ -214,6 +214,71 @@ There is no `"start"` script; run `node server.js` to launch Express.
 - `app.use('/api/messages', messageRoutes)`
 - `app.use('/api', authMeRoutes)`
 
+🧪 Testing
+
+This project includes a complete test suite covering unit tests, integration tests, and Socket.IO tests.
+
+📦 Tools Used
+	•	Jest – Test runner (configured for ES Modules)
+	•	Supertest – For HTTP integration tests
+	•	mongodb-memory-server – Spins up an in-memory MongoDB for tests (no real DB needed)
+	•	Socket.IO Client/Server – For real-time communication tests
+
+⸻
+
+✅ Unit Tests
+
+Unit tests verify the core logic of individual modules in isolation:
+	•	User model
+	•	Role enum validation (Admin, Tenant)
+	•	Password hashing and comparePassword with bcrypt
+	•	Property model
+	•	Required fields (title, rent)
+	•	Default values and status enum validation
+	•	AddTenant model
+	•	Requires a user reference
+	•	Status enum validation (paid, unpaid, etc.)
+	•	Auth middleware
+	•	Rejects missing/invalid JWT tokens
+	•	Attaches decoded user to requests on success
+	•	Enforces role-based access control (requireRole)
+
+⸻
+
+🔗 Integration Tests
+
+Integration tests validate Express routes working together with the in-memory MongoDB:
+	•	Auth routes (/api/auth)
+	•	Reject invalid roles during registration
+	•	Register & login user, return JWT
+	•	Property routes (/api/properties)
+	•	Create property
+	•	List properties
+	•	Tenant routes (/api/addtenants)
+	•	List tenants (empty and populated)
+	•	Upsert tenant-property assignments
+
+⸻
+
+⚡ Socket.IO Test
+	•	Starts a temporary Socket.IO server in-memory
+	•	Connects a client via WebSocket
+	•	Verifies a ping → pong message exchange
+	•	Ensures real-time messaging works correctly
+
+
+  ▶️ Running the Tests
+	1.	Install dev dependencies (once):
+  npm i -D jest supertest mongodb-memory-server socket.io-client
+
+  2.	Run the test suite:
+  npm test
+
+  	3.	Jest will:
+	•	Spin up an in-memory MongoDB
+	•	Mount your Express routes in an isolated app
+	•	Run all unit + integration + socket tests
+
 ## Team
 
 - Durga Reddy
