@@ -103,27 +103,33 @@ async function apiCall(url, method, data) {
 }
 
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault()
-  hideMessage("login-message")
-  setLoading("login-btn", true, "Signing in...", "Sign In")
+  e.preventDefault();
+  hideMessage("login-message");
+  setLoading("login-btn", true, "Signing in...", "Sign In");
 
-  const formData = new FormData(e.target)
-  const email = formData.get("email").trim()
-  const password = formData.get("password")
+  const formData = new FormData(e.target);
+  const email = formData.get("email").trim();
+  const password = formData.get("password");
 
   try {
-    const result = await apiCall("/api/auth/login", "POST", { email, password })
+    const result = await apiCall("/api/auth/login", "POST", { email, password });
 
-    localStorage.setItem("token", result.token)
+    // Save token and user info
+    localStorage.setItem("token", result.token);
+    localStorage.setItem("userId", result.user._id);   // ✅ FIX
+    localStorage.setItem("role", result.user.role);    // optional
+    localStorage.setItem("currentUser", JSON.stringify(result.user));
 
-    const redirectUrl = result.user?.role === "Admin" ? "/admin.html" : "/tenant.html"
-    window.location.href = redirectUrl
+    const redirectUrl =
+      result.user?.role === "Admin" ? "/admin.html" : "/tenantdashboard.html";
+    window.location.href = redirectUrl;
   } catch (error) {
-    showMessage("login-message", error.message, true)
+    showMessage("login-message", error.message, true);
   } finally {
-    setLoading("login-btn", false, "Signing in...", "Sign In")
+    setLoading("login-btn", false, "Signing in...", "Sign In");
   }
-})
+});
+
 
 document.getElementById("signupForm").addEventListener("submit", async (e) => {
   e.preventDefault()

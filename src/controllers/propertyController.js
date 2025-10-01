@@ -100,3 +100,20 @@ export const destroy = async (req, res) => {
     res.status(400).json({ message: e.message || 'Failed to delete property' });
   }
 };
+
+/** POST /api/properties/:id/images (append new images) */
+export const addImages = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const p = await Property.findById(id);
+    if (!p) return res.status(404).json({ message: 'Not found' });
+
+    const newImagePaths = (req.files || []).map(f => `/uploads/properties/${f.filename}`);
+    p.images = [...(p.images || []), ...newImagePaths];
+    await p.save();
+
+    res.json({ message: 'Images uploaded', images: p.images });
+  } catch (e) {
+    res.status(400).json({ message: e.message || 'Failed to upload images' });
+  }
+};
