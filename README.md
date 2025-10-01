@@ -138,7 +138,7 @@ npm run preview      # preview built assets
 | POST   | `/api/auth/register` | User registration   |
 | POST   | `/api/auth/logout`   | User logout         |
 
----
+```
 
 ### Properties
 | Method | Endpoint                  | Description             |
@@ -148,7 +148,7 @@ npm run preview      # preview built assets
 | PUT    | `/api/properties/:id`     | Update property         |
 | DELETE | `/api/properties/:id`     | Delete property         |
 
----
+```
 
 ### Tenants
 | Method | Endpoint               | Description         |
@@ -158,7 +158,7 @@ npm run preview      # preview built assets
 | PUT    | `/api/tenants/:id`     | Update tenant       |
 | DELETE | `/api/tenants/:id`     | Remove tenant       |
 
----
+```
 
 ### Issues
 | Method | Endpoint             | Description              |
@@ -168,7 +168,7 @@ npm run preview      # preview built assets
 | PUT    | `/api/issues/:id`    | Update issue status      |
 | DELETE | `/api/issues/:id`    | Delete issue             |
 
----
+```
 
 ### Messages (Chat)
 | Method | Endpoint            | Description          |
@@ -176,14 +176,14 @@ npm run preview      # preview built assets
 | GET    | `/api/messages`     | Fetch chat history   |
 | POST   | `/api/messages`     | Send new message     |
 
----
+```
 
 ## Controllers
 - **addtenantController.js** – handles tenant creation and updates  
 - **issueController.js** – CRUD operations for tenant issues  
 - **propertyController.js** – CRUD operations for properties  
 
----
+```
 
 ## Middleware
 - **auth.js** – JWT verification middleware  
@@ -191,8 +191,7 @@ npm run preview      # preview built assets
   - Attaches decoded user to `req.user`  
   - Can be extended for role-based access  
 
----
-
+```
 ## Utils
 - **auth.js** – helper functions to generate and verify JWT tokens  
   - Password hashing and verification with bcrypt  
