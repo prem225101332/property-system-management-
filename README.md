@@ -279,6 +279,74 @@ Integration tests validate Express routes working together with the in-memory Mo
 	•	Mount your Express routes in an isolated app
 	•	Run all unit + integration + socket tests
 
+
+⸻
+
+📘 Admin User Guide
+
+### 1. Introduction
+This guide is for **Administrators** of the system.  
+It explains how to log in, manage tenants, properties, issues, and communicate with tenants.
+
+### 2. Admin Dashboard
+- File: `public/admin.html`  
+- Overview of properties, tenants, and issues.
+
+
+### 3. Manage Properties
+- Add, edit, or delete property records.
+
+### 4. Manage Tenants
+- Add new tenants.
+
+### 5. Manage Issues
+- View and resolve tenant issues.
+
+### 6. Chat with Tenants
+- Real-time messaging with tenants.  
+
+---
+
+## 📘 Tenant User Guide
+
+### 1. Introduction
+This guide is for **Tenants** using the system.  
+It explains how to log in, view properties, report issues, and chat with admin.
+
+### 2. Tenant Dashboard
+- File: `public/tenantdashboard.html`  
+- Shows tenant’s property details, issues, and chat option.
+
+### 3. Report Issues
+- File: `public/tenant-issues.html`  
+- Raise complaints or maintenance requests.
+
+### 4. Chat with Admin
+- File: `public/tenant-chat.html`  
+- Chat directly with admin for help.
+
+---
+
+## 🔧 Troubleshooting
+
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| App not starting | Node.js not installed | Install Node.js, run `node server.js` |
+| Login not working | Wrong credentials | Reset admin/tenant credentials |
+| Chat not working | Socket issue | Refresh browser, restart server |
+
+---
+## 🚀 Getting Started (for Developers)
+
+# Install dependencies
+npm install
+
+# Run server
+node server.js
+
+---
+
 ## Team
 
 - Durga Reddy
