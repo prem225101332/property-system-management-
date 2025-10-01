@@ -337,7 +337,7 @@ It explains how to log in, manage tenants, properties, issues, and communicate w
 - Add, edit, or delete property records.
 
 ### 4. Manage Tenants
-- Add new tenants.
+- Edit/Delete added tenants.
 
 ### 5. Manage Issues
 - View and resolve tenant issues.
@@ -355,7 +355,7 @@ It explains how to log in, view properties, report issues, and chat with admin.
 
 ### 2. Tenant Dashboard
 - File: `public/tenantdashboard.html`  
-- Shows tenant’s property details, issues, and chat option.
+- Shows tenant’s property details and other property options.
 
 ### 3. Report Issues
 - File: `public/tenant-issues.html`  
