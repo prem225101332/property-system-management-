@@ -66,6 +66,7 @@ A simple Property Management System with a Node.js + Express backend, MongoDB (v
     │   ├── Issue.js
     │   ├── Property.js
     │   └── User.js
+        └── Message.js
     ├── routes/
     │   ├── addTenantRoutes.js
     │   ├── auth.js
