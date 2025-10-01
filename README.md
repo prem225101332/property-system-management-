@@ -203,7 +203,7 @@ There is no `"start"` script; run `node server.js` to launch Express.
 
 ---
 
-### Mounts in `server.js`
+### Routes in `server.js`
 
 - `app.use('/api/auth', authRoutes)`
 - `app.use('/api/customers', customerRoutes)`
