@@ -1,4 +1,3 @@
-<!-- public/addtenant.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +6,12 @@
   <title>Property Management System - Tenants</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="/css/admin.css" rel="stylesheet">
-
-  <!-- ✅ Bootstrap 5 CSS (needed for modal) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="sidebar">
     <div class="sidebar-header">
-      <div class="logo"><i class="fas fa-building"></i><span>PropertyHub</span></div>
+      <div class="logo"><i class="fas fa-building"></i><span>Property</span></div>
       <div class="subtitle">Management System</div>
     </div>
     <nav class="sidebar-nav">
@@ -32,9 +29,9 @@
 
   <div class="main-content">
     <header class="header">
-      <div class="header-left"><h1>Tenant Management</h1><p>Manage your tenants</p></div>
+      <div class="header-left">
+        <p>Manage your tenants</p></div>
       <div class="header-right">
-        <!-- Trigger Bootstrap modal -->
         <a href="#" class="user-profile" data-bs-toggle="modal" data-bs-target="#profileModal">
           <span>PK</span>
         </a>
@@ -112,7 +109,6 @@
     </div>
   </div>
 
-  <!-- Profile Modal (Bootstrap) -->
   <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -127,7 +123,6 @@
           <p><strong>Role:</strong> <span id="pmRole">—</span></p>
           <p><strong>Phone:</strong> <span id="pmPhone">—</span></p>
 
-          <!-- Tenant-only -->
           <div id="pmTenantBlock" class="mt-3 d-none">
             <hr>
             <p><strong>Property:</strong> <span id="pmProperty">—</span></p>
@@ -146,99 +141,16 @@
   <script src="/js/signout.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Hydrate when the modal becomes visible
       const modalEl = document.getElementById('profileModal');
       modalEl?.addEventListener('shown.bs.modal', hydrateProfileModal);
 
-      // Logout from modal
       document.getElementById('btnLogout')?.addEventListener('click', () => {
         localStorage.removeItem('token');
         window.location.href = '/index.html';
       });
     });
-
-    function getToken(){ return localStorage.getItem('token'); }
-    function authHeaders(){ const t=getToken(); return t?{ Authorization:`Bearer ${t}` }:{}; }
-    async function getJSON(url,{allow401=false}={}){
-      const res = await fetch(url,{ headers:{'Content-Type':'application/json',...authHeaders()}, credentials:'include' });
-      if(!res.ok){ if(allow401 && res.status===401) return null; throw new Error(`${res.status} ${url}`); }
-      const body = await res.json();
-      return body?.data ?? body; // supports {ok:true,data:{...}} or plain object
-    }
-    function setText(id, v){ const el=document.getElementById(id); if(el) el.textContent = v ?? '—'; }
-
-    async function hydrateProfileModal(){
-      try{
-        // who am I
-        let user = await getJSON('/api/auth/me', { allow401:true });
-        if(!user){
-          // fallback to JWT if you store it
-          const t = getToken();
-          if(t && t.split('.').length>=2){
-            const p = JSON.parse(atob(t.split('.')[1]));
-            if(p?.email) user = { name:p.name, email:p.email, role:p.role, phone:p.phone ?? null };
-          }
-        }
-        if(!user || !user.email) throw new Error('No identity');
-
-        // fill basics
-        setText('pmName',  user.name || 'User');
-        setText('pmEmail', user.email);
-        setText('pmRole',  user.role || '—');
-
-        // phone (from user or tenant record)
-        let phone = user.phone ?? null;
-        try{
-          const me = await getJSON('/api/customers/me/record');
-          phone = phone ?? me?.phone ?? null;
-        }catch{}
-        setText('pmPhone', phone);
-
-        // tenant extras
-        const tenantBlock = document.getElementById('pmTenantBlock');
-        if(user.role === 'Tenant'){
-          tenantBlock?.classList.remove('d-none');
-
-          let property = user.property ?? null;
-          let dueAmount = null, paid = null;
-
-          try{
-            const c = await getJSON('/api/customers/me/record');
-            if(c){
-              property = property ?? c.propertyName ?? c.property ?? null;
-              if(typeof c.dueAmount === 'number') dueAmount = c.dueAmount;
-              if(typeof c.paid === 'boolean')     paid = c.paid;
-            }
-          }catch{}
-
-          if(!property){
-            try{
-              const list = await getJSON('/api/addtenants');
-              const match = Array.isArray(list)
-                ? list.find(x => (x.email || '').toLowerCase() === (user.email || '').toLowerCase())
-                : null;
-              if(match){
-                property = match.propertyName || match.property || property;
-                if(typeof match.rent === 'number') dueAmount = match.rent;
-              }
-            }catch{}
-          }
-
-          setText('pmProperty', property);
-          const rentText = (dueAmount!=null ? `A$${Number(dueAmount).toFixed(2)}` : '—')
-                         + (paid!=null ? ` • Paid: ${paid ? 'Yes' : 'No'}` : '');
-          setText('pmRent', rentText);
-        } else {
-          tenantBlock?.classList.add('d-none');
-        }
-      }catch(e){
-        console.error('[profile modal] failed:', e?.message||e);
-        // leave defaults in place
-      }
-    }
   </script>
-
-  <!-- ✅ Bootstrap 5 JS (needed for modal behavior) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/profile-modal.js"></script>
 </body>
 </html>
