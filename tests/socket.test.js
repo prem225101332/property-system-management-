@@ -1,44 +1,62 @@
-import { createServer } from "http";
-import { Server as IOServer } from "socket.io";
-import Client from "socket.io-client";
-import { expect } from "chai";
+// tests/socket.test.js (Jest + ESM)
+import { jest } from '@jest/globals';
+import { createServer } from 'http';
+import { Server as IOServer } from 'socket.io';
+import { io as Client } from 'socket.io-client';
 
-describe("Socket.IO chat", function() {
-  let io, serverSocket, httpServer, clientSocket;
+jest.setTimeout(15000);
 
-  before((done) => {
+describe('Socket.IO', () => {
+  let io, httpServer, port;
+  let client;
+
+  beforeAll(async () => {
     httpServer = createServer();
-    io = new IOServer(httpServer, { cors: { origin: "*" } });
+    io = new IOServer(httpServer, { cors: { origin: '*' } });
 
-    io.on("connection", (socket) => {
-      serverSocket = socket;
-
-      socket.on("sendMessage", (data) => {
-        socket.emit("receiveMessage", data);
+    // very small demo server: echoes "ping" -> "pong"
+    io.on('connection', (socket) => {
+      socket.on('ping', (payload) => {
+        socket.emit('pong', payload);
       });
     });
 
-    httpServer.listen(() => {
-      const port = httpServer.address().port;
-      clientSocket = new Client(`http://localhost:${port}`);
-      clientSocket.on("connect", done);
-    });
+    await new Promise((resolve) => httpServer.listen(0, resolve));
+    port = httpServer.address().port;
   });
 
-  after(() => {
-    io.close();
-    clientSocket.close();
-    httpServer.close();
+  afterAll(async () => {
+    if (client && client.connected) client.disconnect();
+    // Close server first, then httpServer
+    await new Promise((resolve) => io.close(resolve));
+    await new Promise((resolve) => httpServer.close(resolve));
   });
 
-  it("should send and receive messages", (done) => {
-    const testMessage = { senderId: "admin", message: "Hello Tenant" };
-
-    clientSocket.on("receiveMessage", (msg) => {
-      expect(msg).to.deep.equal(testMessage);
-      done();
+  test('connects and exchanges a message', async () => {
+    client = new Client(`http://localhost:${port}`, {
+      transports: ['websocket'],
+      forceNew: true,
+      reconnection: false,
     });
 
-    clientSocket.emit("sendMessage", testMessage);
+    // wait for connection
+    await new Promise((resolve, reject) => {
+      client.on('connect', resolve);
+      client.on('connect_error', reject);
+    });
+    expect(client.connected).toBe(true);
+
+    // send ping, await pong
+    const payload = { hello: 'world' };
+    const pong = await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('No pong received')), 5000);
+      client.once('pong', (data) => {
+        clearTimeout(timer);
+        resolve(data);
+      });
+      client.emit('ping', payload);
+    });
+
+    expect(pong).toEqual(payload);
   });
 });
