@@ -11,30 +11,6 @@ class DataManager {
   loadProperties() {
     const properties = localStorage.getItem('properties');
     if (!properties) {
-      const defaultProperties = [
-        {
-          id: 'prop-1',
-          name: 'Sunset Apartments',
-          address: '123 Main St, City, State 12345',
-          type: 'Apartment',
-          rentAmount: 1200,
-          deposit: 2400,
-          status: 'Occupied',
-          tenantId: 'tenant-1',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'prop-2',
-          name: 'Downtown Loft',
-          address: '456 Oak Ave, City, State 12345',
-          type: 'Loft',
-          rentAmount: 1800,
-          deposit: 3600,
-          status: 'Available',
-          tenantId: null,
-          createdAt: new Date().toISOString()
-        }
-      ];
       localStorage.setItem('properties', JSON.stringify(defaultProperties));
       return defaultProperties;
     }
