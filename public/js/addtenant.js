@@ -1,4 +1,3 @@
-// public/js/addtenant.js
 document.addEventListener('DOMContentLoaded', function () {
   loadTenants();
   document.getElementById('addNewTenantBtn')?.addEventListener('click', async () => {

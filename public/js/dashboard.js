@@ -39,7 +39,6 @@ function asNumber(n, fallback = 0) {
   return Number.isFinite(x) ? x : fallback;
 }
 
-// API calls
 async function fetchProperties() {
   const res = await fetch('/api/properties');
   if (!res.ok) throw new Error('Failed to fetch properties');
@@ -47,29 +46,24 @@ async function fetchProperties() {
 }
 
 async function fetchTenants() {
-  // Based on your controller naming, GET /api/addtenants returns an array
   const res = await fetch('/api/addtenants');
   if (!res.ok) throw new Error('Failed to fetch tenants');
-  return res.json(); // array of tenants
+  return res.json(); 
 }
 
 // Renderers
 function renderMetrics({ properties, tenants }) {
-  // Total properties
   els.totalProps.textContent = properties.length;
 
-  // Active tenants: if you store status, count those considered "active". Fallback to all tenants length.
-  // Your AddTenant schema has "status" (default 'paid'). If you track "active" differently, adjust here.
-  const activeCount = tenants.length; // tweak if you have tenant.active flag
+
+  const activeCount = tenants.length; 
   els.activeTenants.textContent = activeCount;
 
-  // Revenue = sum of rent for tenants where status === 'paid'
   const revenue = tenants
     .filter(t => String(t.status || '').toLowerCase() === 'paid')
     .reduce((sum, t) => sum + asNumber(t.rent), 0);
   els.monthRevenue.textContent = AUD.format(revenue);
 
-  // Outstanding dues = sum of rent for tenants where status !== 'paid'
   const dues = tenants
     .filter(t => String(t.status || '').toLowerCase() !== 'paid')
     .reduce((sum, t) => sum + asNumber(t.rent), 0);
@@ -104,7 +98,6 @@ function renderPropertiesTable(properties) {
   els.tbody.innerHTML = rows;
 }
 
-// Basic HTML escape to prevent XSS from any untrusted strings
 function escapeHtml(str) {
   return String(str)
     .replaceAll('&', '&amp;')
@@ -114,7 +107,6 @@ function escapeHtml(str) {
     .replaceAll("'", '&#039;');
 }
 
-// Init
 (async function initDashboard() {
   try {
     hideAlert();
@@ -124,11 +116,9 @@ function escapeHtml(str) {
   } catch (err) {
     console.error(err);
     showAlert('danger', err.message || 'Failed to load dashboard');
-    // keep placeholder row if table failed
   }
 })();
 
-// Stubs for your quick-action buttons (optional)
 window.showAddPropertyModal = function () {
   showAlert('info', 'Open your Add Property modal here.');
 };
